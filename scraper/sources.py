@@ -192,65 +192,100 @@ def _extract_clean_text(soup) -> str:
 
 
 def enrich_article_body(article: Article) -> Article:
-    """抓取原文网页，提取正文内容到 article.body。对 Google News 源尝试多种策略。"""
-    if article.body:
-        return article  # 已有正文，跳过
+    """抓取原文网页获取完整正文，优先文章页面 → RSS 描述降级"""
+    if article.body and len(article.body) > 500:
+        return article
 
-    # 策略 1：The Black Vault 等已有 raw_description，直接清理
+    # 跳过 Google News 链接（JS 渲染，无法爬取）
+    if "news.google.com" in article.url:
+        return article
+
+    # 策略 1：爬取文章页面全文（对 Black Vault 等管用）
+    body_from_page = ""
+    if article.url and article.url.startswith("http") and "news.google.com" not in article.url:
+        try:
+            resp = requests.get(
+                article.url,
+                headers={"User-Agent": (
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/125.0.0.0 Safari/537.36"
+                )},
+                timeout=15,
+                allow_redirects=True,
+            )
+            if resp.status_code == 200:
+                content_type = resp.headers.get("content-type", "")
+                if "text/html" in content_type or "application/xhtml" in content_type:
+                    soup = BeautifulSoup(resp.content, "lxml")
+                    body_from_page = _extract_full_article_text(soup, article.title)
+        except Exception as e:
+            logger.debug(f"  Page fetch: {e}")
+
+    if body_from_page and len(body_from_page) > 300:
+        article.body = body_from_page[:3000]
+        logger.info(f"  Body from page: {len(article.body)} chars")
+        return article
+
+    # 策略 2：从 RSS description 清理（降级）
     if article.raw_description and len(article.raw_description) > 200:
         clean = re.sub(r'<[^>]+>', ' ', article.raw_description)
         clean = re.sub(r'The post\s+\S+\s+appeared first.*$', '', clean, flags=re.IGNORECASE)
         clean = re.sub(r'\[\.\.\.\].*$', '', clean)
         clean = re.sub(r'\s+', ' ', clean).strip()
-        if len(clean) > 100:
+        if len(clean) > 200:
             article.body = clean
             logger.info(f"  Body from RSS desc: {len(article.body)} chars")
             return article
 
-    # 策略 2：Google News URL → 尝试直接抓原文页
-    if "news.google.com/rss" in article.url:
-        # 尝试搜索找到原始文章 URL
-        source_name = article.source_name.replace("📰 ", "").strip()
-        search_title = article.title[:100]
-        body_text = _scrape_via_search(search_title, source_name)
-        if body_text and len(body_text) > 80:
-            article.body = body_text
-            logger.info(f"  Body from search: {len(article.body)} chars")
-            return article
-
-    # 策略 3：普通 URL，直接爬取
-    try:
-        resp = requests.get(
-            article.url,
-            headers={"User-Agent": (
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/125.0.0.0 Safari/537.36"
-            )},
-            timeout=15,
-            allow_redirects=True,
-        )
-        if resp.status_code != 200:
-            logger.warning(f"  Body fetch failed: HTTP {resp.status_code}")
-            return article
-
-        soup = BeautifulSoup(resp.content, "lxml")
-        body_text = _extract_clean_text(soup)
-
-        if body_text and len(body_text) > 80:
-            # 去掉与标题重复的首行
-            first_line = body_text.split("\n")[0]
-            if article.title[:30].lower() in first_line.lower():
-                body_text = "\n".join(body_text.split("\n")[1:]).strip()
-            article.body = body_text
-            logger.info(f"  Body scraped: {len(article.body)} chars")
-        else:
-            logger.info(f"  Body scraped too short ({len(body_text)} chars), kept summary")
-
-    except Exception as e:
-        logger.warning(f"  Body fetch error: {e}")
+    # 策略 3：URL 可以爬但没找到正文 → 用从页面提取的短文本
+    if body_from_page and len(body_from_page) > 80:
+        article.body = body_from_page
+        logger.info(f"  Body short: {len(article.body)} chars")
 
     return article
+
+
+def _extract_full_article_text(soup, title: str = "") -> str:
+    """从文章页面提取完整正文，过滤导航/广告/评论区"""
+    # 移除不需要的元素
+    for sel in SKIP_CSS_SELECTORS:
+        for el in soup.select(sel):
+            el.decompose()
+
+    # 按优先级尝试正文容器
+    content_selectors = [
+        ".entry-content", ".post-content", ".article-content", ".article-body",
+        "article .content", "article p", "main article",
+        ".story-body", ".post-body",
+        "[itemprop='articleBody']", "#article-body",
+        "main", "article", ".content",
+    ]
+
+    body_el = None
+    for sel in content_selectors:
+        body_el = soup.select_one(sel)
+        if body_el:
+            break
+
+    if not body_el:
+        body_el = soup.body or soup
+
+    # 提取段落文本，过滤短文本和 caption
+    lines = []
+    for el in body_el.find_all(["p", "h2", "h3", "h4"]):
+        text = el.get_text(strip=True)
+        if not text or len(text) < 25:
+            continue
+        if _is_caption_line(text):
+            continue
+        if text.lower() in ("share", "print", "email", "subscribe", "sign up",
+                            "log in", "more", "back to top", "close", "menu",
+                            "read more", "continue reading"):
+            continue
+        lines.append(text)
+
+    return "\n".join(lines)
 
 
 def _scrape_via_search(title: str, source: str) -> str:
@@ -1150,7 +1185,99 @@ def _fetch_cufos() -> list[Article]:
 
 
 # ═══════════════════════════════════════════════════════════════
-# 源 #10: Google News — 「UFO sighting」搜索（事件型新闻）
+# 源 #10: Bing News — UFO sighting 搜索（事件型新闻，含真实 URL）
+# ═══════════════════════════════════════════════════════════════
+
+BING_NEWS_UFO_RSS = "https://www.bing.com/news/search?q=UFO+sighting&format=RSS"
+
+
+def _fetch_bing_news_ufo() -> list[Article]:
+    """从 Bing News RSS 抓取 UFO 目击新闻，提取真实文章来源 URL"""
+    articles = []
+    resp = _try_get(BING_NEWS_UFO_RSS)
+    if not resp:
+        logger.debug("Bing News RSS unreachable, falling back to Google News")
+        return _fetch_google_news_ufo()
+
+    try:
+        feed = feedparser.parse(resp.content)
+        if not feed.entries:
+            logger.debug("Bing News returned 0 entries, falling back to Google News")
+            return _fetch_google_news_ufo()
+
+        for entry in feed.entries[:25]:
+            title = entry.get("title", "")
+            bing_link = entry.get("link", "")
+            if not title or not bing_link:
+                continue
+
+            # 从 Bing 重定向 URL 中提取真实文章链接
+            real_url = _extract_real_url_from_bing(bing_link)
+            raw_desc = entry.get("summary", "") or entry.get("description", "")
+            summary = _clean_html(raw_desc)[:350]
+
+            # 跳过纯政策/报告类，过滤掉明显是 listicle 的
+            if not _is_uap_article(title, summary):
+                continue
+
+            # 提取来源 — Bing RSS 用 News:Source 命名空间
+            source_name = "新闻聚合"
+            # 从 title 中提取（格式: "Title - SourceName"）
+            if " - " in title:
+                parts = title.rsplit(" - ", 1)
+                if len(parts) == 2 and len(parts[1]) < 30:
+                    source_name = parts[1].strip()
+                    title = parts[0].strip()  # 去掉来源后缀
+            # 也检查 source 字段
+            pub = entry.get("source", {})
+            if pub and pub.get("title"):
+                source_name = pub["title"]
+
+            published = datetime.now()
+            if hasattr(entry, "published_parsed") and entry.published_parsed:
+                try:
+                    published = datetime(*entry.published_parsed[:6])
+                except Exception:
+                    pass
+
+            hours_ago = max(0, (datetime.now() - published).total_seconds() / 3600)
+            score = 4.0 + max(0, 168 - hours_ago) * 0.03  # 7天窗口
+
+            articles.append(Article(
+                title=title,
+                url=real_url,  # 用真实文章 URL
+                summary=summary,
+                source_name=f"📰 {source_name}",
+                published=published,
+                score=score,
+                raw_description=raw_desc,
+            ))
+    except Exception as e:
+        logger.warning(f"Bing News RSS parse error: {e}, trying Google News")
+        return _fetch_google_news_ufo()
+
+    logger.info(f"  Bing/Google News UFO: {len(articles)} articles")
+    return articles
+
+
+def _extract_real_url_from_bing(bing_url: str) -> str:
+    """从 Bing News 重定向 URL 中提取真实的文章链接"""
+    from urllib.parse import urlparse, parse_qs, unquote
+
+    parsed = urlparse(bing_url)
+    params = parse_qs(parsed.query)
+    real_url = params.get("url", [""])[0]
+    if real_url:
+        real_url = unquote(real_url)
+        # Bing 有时会在 URL 前加 http 导致重复
+        if real_url.startswith("http://http"):
+            real_url = real_url.replace("http://http", "http", 1)
+        return real_url
+    return bing_url  # 降级：返回原链接
+
+
+# ═══════════════════════════════════════════════════════════════
+# 源 #10b: Google News — 降级备用
 # ═══════════════════════════════════════════════════════════════
 
 GOOGLE_NEWS_UFO_RSS = "https://news.google.com/rss/search?q=UFO+sighting&hl=en-US&gl=US&ceid=US:en"
@@ -1346,7 +1473,7 @@ SOURCE_FETCHERS = [
     ("UK National Archives",  _fetch_uk_archives,      2.5,   False),
     ("MUFON",                 _fetch_mufon,            2.0,   False),
     ("CUFOS",                 _fetch_cufos,            2.0,   False),
-    ("Google News UFO",       _fetch_google_news_ufo,  4.5,   True),
+    ("Bing News UFO",          _fetch_bing_news_ufo,    4.5,   True),
     ("MUFON Cases",           _fetch_mufon_cases,      3.5,   True),
     ("Reddit (降级)",          _fetch_reddit_fallback,  2.0,   False),
 ]
