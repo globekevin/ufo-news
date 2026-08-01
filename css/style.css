@@ -258,7 +258,8 @@ body{font-family:var(--font-body);background:var(--bg-deep);color:var(--text-pri
   background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.3); color: var(--accent-cyan);
 }
 .archive-file-bottom {
-  display: flex; justify-content: space-between; align-items: center; margin-top: auto;
+  display: flex; justify-content: center; align-items: center; margin-top: auto;
+  padding-top: 4px;
 }
 .archive-file-dl-btn {
   padding: 7px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;
