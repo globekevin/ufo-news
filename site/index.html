@@ -89,28 +89,39 @@
   </button>
 </section>
 
-<!-- ========== Archive ========== -->
+<!-- ========== Archive: 英国国家档案馆 UFO 档案 ========== -->
 <section class="section section-alt" id="archive">
-  <div class="archive-header">
+  <div class="archives-header">
     <div class="section-header-left">
-      <span class="section-label">ARCHIVE · 往期归档</span>
-      <h2 class="section-title">历史发现数据库</h2>
-      <p class="section-meta" id="archiveMeta">数据加载中…</p>
+      <span class="section-label">ARCHIVE · 历史发现数据库</span>
+      <h2 class="section-title">英国国家档案馆 UFO 档案</h2>
+      <p class="section-meta" id="archiveMeta">英国国防部 (MoD) 于 2008–2013 年分 12 批解密并移交国家档案馆的 209 份 UFO/UAP 官方档案，跨度为 1950 年代至 2009 年。包含目击报告、雷达追踪记录、部门间备忘录、国会质询答复等原始政府文件。均可免费下载 PDF。</p>
     </div>
     <div class="search-box">
       <img src="assets/svg/2_128-20260801_153410294.svg" alt="搜索">
-      <input type="text" placeholder="搜索关键词、来源、地区…" id="searchInput">
+      <input type="text" placeholder="搜索档案编号、标题、分类…" id="archiveSearchInput">
     </div>
   </div>
 
-  <div class="archive-table" id="archiveTable">
-    <div class="archive-table-header">
-      <span class="archive-table-col date">日期</span>
-      <span class="archive-table-col title">标题</span>
-      <span class="archive-table-col source">来源</span>
-      <span class="archive-table-col tag">分类</span>
+  <!-- 文件网格 -->
+  <div class="archives-grid" id="archivesGrid">
+    <!-- JS 动态渲染 36 条 -->
+  </div>
+
+  <!-- 加载状态 -->
+  <div id="archivesLoading" class="loading-state" style="padding:40px 0">
+    <div class="loading-spinner"></div>
+    <p>正在调取英国国家档案馆 UFO 解密档案…</p>
+  </div>
+
+  <!-- 更多按钮 -->
+  <div class="archives-more-wrap" id="archivesMoreWrap" style="display:none">
+    <button class="view-more-btn" id="archivesMoreBtn">
+      展开更多档案 <span class="view-more-arrow" id="archivesMoreArrow">▼</span>
+    </button>
+    <div class="archives-grid archives-grid-extra" id="archivesGridExtra">
+      <!-- JS 动态渲染剩余条目 -->
     </div>
-    <div id="archiveRows"></div>
   </div>
 </section>
 
@@ -133,8 +144,8 @@
     </div>
     <div class="stat-card">
       <span class="stat-label">数据来源覆盖</span>
-      <span class="stat-value">5+</span>
-      <span class="stat-change">Reddit · Space.com · 多源聚合</span>
+      <span class="stat-value">9+</span>
+      <span class="stat-change">AARO · NASA · NUFORC · 英国国家档案馆 · 多国官方源</span>
     </div>
     <div class="stat-card">
       <span class="stat-label">AI 翻译引擎</span>
@@ -158,11 +169,11 @@
     </div>
     <div class="map-right">
       <span class="map-right-title">TOP 来源地区</span>
-      <div class="region-row"><span class="region-rank">01</span><div class="region-info"><span class="region-country">美国</span><span class="region-count">NASA · Reddit r/UFOs</span></div><div class="region-bar"></div></div>
-      <div class="region-row"><span class="region-rank">02</span><div class="region-info"><span class="region-country">英国</span><span class="region-count">BBC · MOD 解密档案</span></div><div class="region-bar"></div></div>
-      <div class="region-row"><span class="region-rank">03</span><div class="region-info"><span class="region-country">澳大利亚</span><span class="region-count">ABC · 国防部 FOIA</span></div><div class="region-bar"></div></div>
-      <div class="region-row"><span class="region-rank">04</span><div class="region-info"><span class="region-country">日本</span><span class="region-count">航空自卫队档案</span></div><div class="region-bar"></div></div>
-      <div class="region-row"><span class="region-rank">05</span><div class="region-info"><span class="region-country">智利</span><span class="region-count">CEFAA 官方机构</span></div><div class="region-bar"></div></div>
+      <div class="region-row"><span class="region-rank">01</span><div class="region-info"><span class="region-country">美国</span><span class="region-count">AARO · NASA UAP · NUFORC · Black Vault</span></div><div class="region-bar"></div></div>
+      <div class="region-row"><span class="region-rank">02</span><div class="region-info"><span class="region-country">英国</span><span class="region-count">国家档案馆 · 国防部 UFO 档案</span></div><div class="region-bar"></div></div>
+      <div class="region-row"><span class="region-rank">03</span><div class="region-info"><span class="region-country">法国</span><span class="region-count">GEIPAN 国家级 UAP 研究组</span></div><div class="region-bar"></div></div>
+      <div class="region-row"><span class="region-rank">04</span><div class="region-info"><span class="region-country">智利</span><span class="region-count">CEFAA 官方 UAP 机构</span></div><div class="region-bar"></div></div>
+      <div class="region-row"><span class="region-rank">05</span><div class="region-info"><span class="region-country">美国民间</span><span class="region-count">MUFON · CUFOS · FBI Vault · CIA</span></div><div class="region-bar"></div></div>
     </div>
   </div>
 </section>

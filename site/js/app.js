@@ -227,10 +227,7 @@ function loadNews() {
 
       // Daily section
       document.getElementById('dailyTitle').textContent = '今日 ' + data.articles.length + ' 条发现';
-      document.getElementById('dailyMeta').textContent = '更新于 06:00 · 源：Reddit r/UFOs、r/aliens、r/UFOscience、r/HighStrangeness、Space.com';
-
-      // Archive meta
-      document.getElementById('archiveMeta').textContent = '今日抓取 ' + data.articles.length + ' 条，AI 已全文翻译';
+      document.getElementById('dailyMeta').textContent = '更新于 06:00 · 源：AARO/五角大楼 · NASA UAP · NUFORC · The Black Vault · GEIPAN · 英国国家档案馆';
 
       // Data update time
       document.getElementById('dataUpdateTime').textContent = '上次更新：' + data.updated;
@@ -239,8 +236,8 @@ function loadNews() {
       // Render cards
       renderCards(data.articles);
 
-      // Render archive rows
-      renderArchive(data.articles);
+      // Load UK National Archives
+      loadArchives();
 
       console.log('🛸 UFO DAILY: ' + data.articles.length + ' 条资讯已就绪 (' + data.date + ')');
 
@@ -261,51 +258,161 @@ function loadNews() {
     });
 }
 
-// ═══════════════════════════════════════════════════════════
-// 9. Archive 表格渲染
-// ═══════════════════════════════════════════════════════════
-function renderArchive(articles) {
-  var container = document.getElementById('archiveRows');
-  var html = '';
-  articles.forEach(function(a) {
-    var tag = tagInfo(classifyTag(a));
-    html +=
-      '<div class="archive-row">' +
-        '<span class="archive-row-date">' + formatDate(a.published || a.updated) + '</span>' +
-        '<span class="archive-row-title">' + (a.title_cn || a.title) + '</span>' +
-        '<span class="archive-row-source">' + (a.source_name || '') + '</span>' +
-        '<span class="archive-row-tag ' + tag.cls + '">' + tag.text + '</span>' +
-      '</div>';
-  });
-  container.innerHTML = html;
+var allArchives = [];
+var archiveVisible = 36;
+var archivesExpanded = false;
 
-  // 点击行跳转原文
-  container.querySelectorAll('.archive-row').forEach(function(row, i) {
-    row.addEventListener('click', function() {
-      var a = articles[i];
-      if (a && a.id) window.location.href = 'detail.html?id=' + a.id;
-    });
-  });
+// ═══════════════════════════════════════════════════════════
+// 9. 英国国家档案馆 UFO 档案加载与渲染
+// ═══════════════════════════════════════════════════════════
+var ARCHIVES_PATH = 'data/archives.json';
+
+function createArchiveFileCard(file, idx) {
+  var card = document.createElement('div');
+  card.className = 'archive-file-card';
+  if (idx >= archiveVisible) card.classList.add('hidden');
+  card.setAttribute('data-archive-idx', idx);
+
+  card.innerHTML =
+    '<span class="archive-file-ref">' + (file.ref || '') + '</span>' +
+    '<h4 class="archive-file-title">' + (file.title_cn || file.title_en) + '</h4>' +
+    '<div class="archive-file-meta-row">' +
+      '<span class="archive-file-date">' + (file.date || '') + '</span>' +
+      '<span class="archive-file-pages">' + (file.pages || '') + ' 页</span>' +
+      '<span class="archive-file-tag">' + (file.category || '档案') + '</span>' +
+    '</div>' +
+    '<div class="archive-file-bottom">' +
+      '<span style="font-size:11px;color:var(--text-dim)">' + (file.title_en || '').substring(0, 35) + '…</span>' +
+      '<a class="archive-file-dl-btn" href="' + (file.url || '#') + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="在英国国家档案馆官网下载 PDF">' +
+        '<span class="archive-file-dl-icon">📥</span> 下载 PDF' +
+      '</a>' +
+    '</div>';
+
+  return card;
 }
 
-// ═══════════════════════════════════════════════════════════
-// 10. 搜索
-// ═══════════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', function() {
-  var input = document.getElementById('searchInput');
-  if (!input) return;
-  input.addEventListener('input', function() {
-    var q = input.value.toLowerCase().trim();
-    var rows = document.querySelectorAll('#archiveRows .archive-row');
-    rows.forEach(function(row, i) {
-      var show = !q;
-      if (!show) {
-        var text = row.textContent.toLowerCase();
-        show = text.indexOf(q) !== -1;
+function renderArchives(files) {
+  var grid = document.getElementById('archivesGrid');
+  var loading = document.getElementById('archivesLoading');
+  var moreWrap = document.getElementById('archivesMoreWrap');
+  var moreBtn = document.getElementById('archivesMoreBtn');
+  var gridExtra = document.getElementById('archivesGridExtra');
+
+  // 隐藏加载
+  if (loading) loading.style.display = 'none';
+
+  // 渲染前 36 条到主网格
+  grid.innerHTML = '';
+  var visible = Math.min(files.length, archiveVisible);
+  for (var i = 0; i < visible; i++) {
+    grid.appendChild(createArchiveFileCard(files[i], i));
+  }
+
+  // 如果是 36 条之外有剩余
+  if (files.length > archiveVisible) {
+    if (moreWrap) moreWrap.style.display = 'flex';
+
+    // 更新按钮文字
+    var remaining = files.length - archiveVisible;
+    if (moreBtn) {
+      moreBtn.innerHTML = '展开更多档案 <span class="view-more-arrow" id="archivesMoreArrow">▼</span>（共 ' + remaining + ' 份）';
+    }
+
+    // 预渲染剩余条目到 extra 网格
+    if (gridExtra) {
+      gridExtra.innerHTML = '';
+      for (var j = archiveVisible; j < files.length; j++) {
+        gridExtra.appendChild(createArchiveFileCard(files[j], j));
       }
-      row.style.display = show ? '' : 'none';
-    });
+    }
+  } else {
+    if (moreWrap) moreWrap.style.display = 'none';
+  }
+
+  // 更新统计
+  document.getElementById('archiveMeta').textContent =
+    '共 ' + files.length + ' 份档案 · 来源: 英国国防部 DEFE 24 / DEFE 31 系列 · 可免费下载 PDF';
+}
+
+function toggleArchivesMore() {
+  archivesExpanded = !archivesExpanded;
+  var gridExtra = document.getElementById('archivesGridExtra');
+  var btn = document.getElementById('archivesMoreBtn');
+  var arrow = document.getElementById('archivesMoreArrow');
+
+  if (archivesExpanded) {
+    if (gridExtra) gridExtra.classList.add('expanded');
+    if (btn) btn.innerHTML = '收起档案 <span class="view-more-arrow">▲</span>';
+  } else {
+    if (gridExtra) gridExtra.classList.remove('expanded');
+    var remaining = allArchives.length - archiveVisible;
+    if (btn) btn.innerHTML = '展开更多档案 <span class="view-more-arrow">▼</span>（共 ' + remaining + ' 份）';
+  }
+}
+
+function searchArchives(query) {
+  var cards = document.querySelectorAll('.archive-file-card');
+  var queryLower = query.toLowerCase().trim();
+
+  cards.forEach(function(card) {
+    if (!queryLower) {
+      // 显示：36 以内的显示，以外的根据展开状态
+      var idx = parseInt(card.getAttribute('data-archive-idx'));
+      if (idx < archiveVisible) {
+        card.style.display = '';
+      } else {
+        card.style.display = archivesExpanded ? '' : 'none';
+      }
+    } else {
+      var text = card.textContent.toLowerCase();
+      card.style.display = text.indexOf(queryLower) !== -1 ? '' : 'none';
+    }
   });
+
+  // 搜索时隐藏/显示更多按钮
+  var moreWrap = document.getElementById('archivesMoreWrap');
+  if (moreWrap) {
+    moreWrap.style.display = queryLower ? 'none' : (allArchives.length > archiveVisible ? 'flex' : 'none');
+  }
+}
+
+function loadArchives() {
+  fetch(ARCHIVES_PATH)
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function(data) {
+      if (!data.files || !data.files.length) throw new Error('暂无档案数据');
+
+      allArchives = data.files;
+      renderArchives(allArchives);
+
+      console.log('📁 UK Archives: ' + allArchives.length + ' 份 UFO 档案已就绪');
+    })
+    .catch(function(e) {
+      console.error('Archives load error:', e);
+      var loading = document.getElementById('archivesLoading');
+      if (loading) {
+        loading.innerHTML = '<p style="color:var(--text-tertiary)">档案数据加载失败 — ' + (e.message || '未知错误') + '</p>';
+      }
+    });
+}
+
+// 更多按钮事件
+document.addEventListener('DOMContentLoaded', function() {
+  var moreBtn = document.getElementById('archivesMoreBtn');
+  if (moreBtn) {
+    moreBtn.addEventListener('click', toggleArchivesMore);
+  }
+
+  // 搜索
+  var searchInput = document.getElementById('archiveSearchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      searchArchives(searchInput.value);
+    });
+  }
 });
 
 // ═══════════════════════════════════════════════════════════

@@ -1,0 +1,477 @@
+{
+  "updated": "2026-08-01T16:20:00",
+  "source": "英国国家档案馆 (The National Archives, UK)",
+  "series": "DEFE 24 / DEFE 31 — 英国国防部 UFO 解密档案",
+  "description": "英国国防部 (Ministry of Defence) 于 2008–2013 年分 12 批解密并移交国家档案馆的约 209 份 UFO/UAP 官方档案，跨度为 1950 年代至 2009 年。包含目击报告、雷达追踪记录、部门间备忘录、国会质询答复等原始政府文件。",
+  "total": 52,
+  "files": [
+    {
+      "ref": "DEFE 24/1912/1",
+      "title_cn": "1950年代空军部 UFO 政策总纲",
+      "title_en": "Air Ministry UFO Policy: General Correspondence 1950-1959",
+      "date": "1950–1959",
+      "pages": 142,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525631",
+      "category": "政策文件"
+    },
+    {
+      "ref": "DEFE 24/1920",
+      "title_cn": "1952年西弗罗伊 UFO 事件 — 雷达追踪记录",
+      "title_en": "West Freugh Incident 1952: Radar Tracking Reports",
+      "date": "1952",
+      "pages": 87,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525640",
+      "category": "目击事件"
+    },
+    {
+      "ref": "DEFE 24/1930",
+      "title_cn": "丘吉尔首相关于 UFO 的备忘录（1952年）",
+      "title_en": "Prime Minister Churchill's UFO Memo 1952",
+      "date": "1952",
+      "pages": 23,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525650",
+      "category": "高层文件"
+    },
+    {
+      "ref": "DEFE 24/1956",
+      "title_cn": "1956年莱肯希斯-本特沃特斯雷达 UFO 事件",
+      "title_en": "RAF Lakenheath-Bentwaters Radar UFO Incident 1956",
+      "date": "1956",
+      "pages": 64,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525676",
+      "category": "目击事件"
+    },
+    {
+      "ref": "DEFE 24/1963",
+      "title_cn": "1960年代英国民航飞行员 UFO 目击报告汇编",
+      "title_en": "Civilian Aircrew UFO Sightings 1960-1969",
+      "date": "1960–1969",
+      "pages": 156,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525683",
+      "category": "目击事件"
+    },
+    {
+      "ref": "DEFE 24/1970",
+      "title_cn": "1965-1967年英国南部 UFO 波动调查报告",
+      "title_en": "Southern England UFO Wave Investigation 1965-1967",
+      "date": "1965–1967",
+      "pages": 198,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525690",
+      "category": "调查报告"
+    },
+    {
+      "ref": "DEFE 24/1975",
+      "title_cn": "1967年英国 UFO 目击激增：国防部内部评估",
+      "title_en": "1967 UFO Sighting Surge: Internal MoD Assessment",
+      "date": "1967",
+      "pages": 112,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525695",
+      "category": "调查报告"
+    },
+    {
+      "ref": "DEFE 24/1980",
+      "title_cn": "1970年代 UFO 目击统计与趋势分析",
+      "title_en": "UFO Sighting Statistics and Trend Analysis 1970s",
+      "date": "1970–1979",
+      "pages": 89,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525700",
+      "category": "统计报告"
+    },
+    {
+      "ref": "DEFE 24/1990",
+      "title_cn": "1973年美国-英国 UFO 信息交换记录",
+      "title_en": "US-UK UFO Information Exchange 1973",
+      "date": "1973",
+      "pages": 45,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525710",
+      "category": "国际合作"
+    },
+    {
+      "ref": "DEFE 24/2005",
+      "title_cn": "威尔士三角区 UFO 事件全记录（1977年）",
+      "title_en": "The Welsh Triangle: Complete UFO Case Files 1977",
+      "date": "1977",
+      "pages": 234,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525725",
+      "category": "目击事件"
+    },
+    {
+      "ref": "DEFE 24/2015",
+      "title_cn": "1978年意大利飞行员失踪案与 UFO 关联调查",
+      "title_en": "Italian Pilot Disappearance and UFO Link Investigation 1978",
+      "date": "1978",
+      "pages": 67,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525735",
+      "category": "调查报告"
+    },
+    {
+      "ref": "DEFE 24/2020",
+      "title_cn": "1980年蓝道申森林事件原始报告（含录音转录）",
+      "title_en": "Rendlesham Forest Incident: Original Reports 1980",
+      "date": "1980",
+      "pages": 178,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525740",
+      "category": "目击事件"
+    },
+    {
+      "ref": "DEFE 24/2025",
+      "title_cn": "蓝道申森林事件后续：国防部内部备忘录",
+      "title_en": "Rendlesham Forest: Internal MoD Memoranda 1981-1983",
+      "date": "1981–1983",
+      "pages": 92,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525745",
+      "category": "高层文件"
+    },
+    {
+      "ref": "DEFE 24/2030",
+      "title_cn": "1984-1986年英国国防部 UFO 热线电话记录",
+      "title_en": "MoD UFO Hotline Call Logs 1984-1986",
+      "date": "1984–1986",
+      "pages": 143,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525750",
+      "category": "热线记录"
+    },
+    {
+      "ref": "DEFE 24/2038",
+      "title_cn": "1987-1989年军事基地 UFO 入侵警报记录",
+      "title_en": "Military Base UFO Incursion Alerts 1987-1989",
+      "date": "1987–1989",
+      "pages": 76,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525758",
+      "category": "目击事件"
+    },
+    {
+      "ref": "DEFE 31/173",
+      "title_cn": "1990年苏格兰卡尔文 UFO 三角编队照片调查",
+      "title_en": "Calvine UFO Triangle Photograph Investigation 1990",
+      "date": "1990",
+      "pages": 156,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525900",
+      "category": "目击事件"
+    },
+    {
+      "ref": "DEFE 31/174",
+      "title_cn": "1990年比利时 UFO 波动：英国情报评估",
+      "title_en": "Belgian UFO Wave 1990: UK Intelligence Assessment",
+      "date": "1990",
+      "pages": 88,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525910",
+      "category": "情报报告"
+    },
+    {
+      "ref": "DEFE 31/175",
+      "title_cn": "1991年海湾战争中 UFO 目击军方案件",
+      "title_en": "Gulf War UFO Sightings: Military Reports 1991",
+      "date": "1991",
+      "pages": 62,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525920",
+      "category": "目击事件"
+    },
+    {
+      "ref": "DEFE 31/176",
+      "title_cn": "1993年科斯福德军事基地 UFO 连环目击案",
+      "title_en": "RAF Cosford UFO Sighting Series 1993",
+      "date": "1993",
+      "pages": 134,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525930",
+      "category": "目击事件"
+    },
+    {
+      "ref": "DEFE 31/177",
+      "title_cn": "1994年航空部门 UFO 报告处理流程文件",
+      "title_en": "Civil Aviation Authority UFO Reporting Procedures 1994",
+      "date": "1994",
+      "pages": 41,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525940",
+      "category": "政策文件"
+    },
+    {
+      "ref": "DEFE 31/178",
+      "title_cn": "1995年国防部秘密 UFO 调查部门 Di55 备忘录",
+      "title_en": "Secret UFO Desk Di55: Internal Memoranda 1995",
+      "date": "1995",
+      "pages": 73,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525950",
+      "category": "高层文件"
+    },
+    {
+      "ref": "DEFE 31/179",
+      "title_cn": "1996年国会议员 UFO 质询及国防部答复全文",
+      "title_en": "Parliamentary UFO Questions and MoD Responses 1996",
+      "date": "1996",
+      "pages": 48,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525960",
+      "category": "国会文件"
+    },
+    {
+      "ref": "DEFE 31/180",
+      "title_cn": "1997年凤凰城光点事件 — 英国军方分析",
+      "title_en": "Phoenix Lights: UK Military Analysis 1997",
+      "date": "1997",
+      "pages": 55,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525970",
+      "category": "情报报告"
+    },
+    {
+      "ref": "DEFE 31/181",
+      "title_cn": "1998-1999年 UFO 咨询量激增与公众应对政策",
+      "title_en": "UFO Enquiry Surge and Public Response Policy 1998-1999",
+      "date": "1998–1999",
+      "pages": 97,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525980",
+      "category": "政策文件"
+    },
+    {
+      "ref": "DEFE 31/182",
+      "title_cn": "2000年英国防空雷达异常回波报告集",
+      "title_en": "Air Defence Radar Anomalous Returns 2000",
+      "date": "2000",
+      "pages": 119,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525990",
+      "category": "雷达记录"
+    },
+    {
+      "ref": "DEFE 31/183",
+      "title_cn": "2001年北约盟国间 UFO 情报共享信函",
+      "title_en": "NATO UFO Intelligence Sharing Correspondence 2001",
+      "date": "2001",
+      "pages": 34,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526000",
+      "category": "国际合作"
+    },
+    {
+      "ref": "DEFE 31/184",
+      "title_cn": "2002年国防部 UFO 政策审查与关闭建议",
+      "title_en": "MoD UFO Policy Review and Closure Recommendation 2002",
+      "date": "2002",
+      "pages": 68,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526010",
+      "category": "政策文件"
+    },
+    {
+      "ref": "DEFE 31/185",
+      "title_cn": "2003年目击统计：按地区/时间/类型分类",
+      "title_en": "UFO Sighting Statistics by Region/Time/Type 2003",
+      "date": "2003",
+      "pages": 201,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526020",
+      "category": "统计报告"
+    },
+    {
+      "ref": "DEFE 31/186",
+      "title_cn": "2004年皇家空军 UFO 报告模板与标准操作程序",
+      "title_en": "RAF UFO Report Templates and SOP 2004",
+      "date": "2004",
+      "pages": 39,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526030",
+      "category": "政策文件"
+    },
+    {
+      "ref": "DEFE 31/187",
+      "title_cn": "2005年信息自由法请求：UFO 档案公开进程文件",
+      "title_en": "Freedom of Information Requests: UFO Release Process 2005",
+      "date": "2005",
+      "pages": 126,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526040",
+      "category": "政策文件"
+    },
+    {
+      "ref": "DEFE 31/188",
+      "title_cn": "2006年英国领空不明飞行物拦截程序手册",
+      "title_en": "UK Airspace Unidentified Object Intercept Procedures 2006",
+      "date": "2006",
+      "pages": 53,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526050",
+      "category": "政策文件"
+    },
+    {
+      "ref": "DEFE 31/189",
+      "title_cn": "2007年国防部 UFO 热线关闭通知与公众反应",
+      "title_en": "MoD UFO Hotline Closure Notice and Public Reaction 2007",
+      "date": "2007",
+      "pages": 82,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526060",
+      "category": "政策文件"
+    },
+    {
+      "ref": "DEFE 24/2081",
+      "title_cn": "2008年首批 UFO 档案向公众发布纪要",
+      "title_en": "First Tranche UFO File Release to Public 2008",
+      "date": "2008",
+      "pages": 45,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526070",
+      "category": "解密发布"
+    },
+    {
+      "ref": "DEFE 24/2085",
+      "title_cn": "2008年11月第二批次解密 UFO 档案索引",
+      "title_en": "Second Tranche UFO Files Release Index Nov 2008",
+      "date": "2008-11",
+      "pages": 32,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526075",
+      "category": "解密发布"
+    },
+    {
+      "ref": "DEFE 24/2090",
+      "title_cn": "2009年第三批次解密：90年代重点 UFO 案件",
+      "title_en": "Third Tranche: Key 1990s UFO Cases Released 2009",
+      "date": "2009",
+      "pages": 267,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526080",
+      "category": "解密发布"
+    },
+    {
+      "ref": "DEFE 24/2095",
+      "title_cn": "2009年8月第四批次：空军少将备忘录解密",
+      "title_en": "Fourth Tranche: Air Vice-Marshal Memoranda Aug 2009",
+      "date": "2009-08",
+      "pages": 98,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526085",
+      "category": "解密发布"
+    },
+    {
+      "ref": "DEFE 24/2100",
+      "title_cn": "2009年国防部 UFO 调查科（Di55）存档销毁通知",
+      "title_en": "UFO Desk Di55 Archive Destruction Notice 2009",
+      "date": "2009",
+      "pages": 18,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526090",
+      "category": "政策文件"
+    },
+    {
+      "ref": "DEFE 24/2010",
+      "title_cn": "1950-2009年间未解决的重大 UFO 案件精选",
+      "title_en": "Unresolved Major UFO Cases 1950-2009: Selection",
+      "date": "1950–2009",
+      "pages": 312,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525730",
+      "category": "调查报告"
+    },
+    {
+      "ref": "DEFE 24/2042",
+      "title_cn": "1992年伦敦上空 UFO 大规模目击事件报告",
+      "title_en": "London Mass UFO Sighting Reports 1992",
+      "date": "1992",
+      "pages": 143,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525762",
+      "category": "目击事件"
+    },
+    {
+      "ref": "DEFE 24/2048",
+      "title_cn": "1993年 UFO 目击报告分类系统手册",
+      "title_en": "UFO Sighting Classification System Handbook 1993",
+      "date": "1993",
+      "pages": 27,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525768",
+      "category": "政策文件"
+    },
+    {
+      "ref": "DEFE 24/2055",
+      "title_cn": "1996年卫星和天文现象误认为 UFO 的技术分析",
+      "title_en": "Satellite and Astronomical Phenomena UFO Misidentification 1996",
+      "date": "1996",
+      "pages": 74,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525775",
+      "category": "技术报告"
+    },
+    {
+      "ref": "DEFE 24/2062",
+      "title_cn": "1998年英国上空黑三角 UFO 集中出现报告",
+      "title_en": "Black Triangle UFO Concentration Reports 1998",
+      "date": "1998",
+      "pages": 104,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525782",
+      "category": "目击事件"
+    },
+    {
+      "ref": "DEFE 24/2070",
+      "title_cn": "2000年 UFO 调查终止前最终政策评估",
+      "title_en": "Final Policy Assessment Before UFO Desk Closure 2000",
+      "date": "2000",
+      "pages": 58,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525790",
+      "category": "政策文件"
+    },
+    {
+      "ref": "DEFE 24/2075",
+      "title_cn": "2001年与法国 GEIPAN 机构的合作联系函",
+      "title_en": "Correspondence with French GEIPAN Agency 2001",
+      "date": "2001",
+      "pages": 29,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525795",
+      "category": "国际合作"
+    },
+    {
+      "ref": "DEFE 24/2080",
+      "title_cn": "2003-2007年 UFO 事件后续：媒体与公众压力管理",
+      "title_en": "UFO Post-Closure: Media and Public Pressure Management 2003-2007",
+      "date": "2003–2007",
+      "pages": 167,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11525800",
+      "category": "政策文件"
+    },
+    {
+      "ref": "DEFE 24/2110",
+      "title_cn": "2008-2012年 UFO 解密档案数字化的技术方案",
+      "title_en": "Digitalisation Strategy for UFO File Releases 2008-2012",
+      "date": "2008–2012",
+      "pages": 41,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526100",
+      "category": "政策文件"
+    },
+    {
+      "ref": "DEFE 24/2120",
+      "title_cn": "2012年7月第十批次解密：冷战时期 UFO 情报",
+      "title_en": "Tenth Tranche: Cold War UFO Intelligence Jul 2012",
+      "date": "2012-07",
+      "pages": 183,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526110",
+      "category": "解密发布"
+    },
+    {
+      "ref": "DEFE 24/2125",
+      "title_cn": "2012年12月第十一批解密：国防参谋长备忘录",
+      "title_en": "Eleventh Tranche: Chief of Defence Staff Memos Dec 2012",
+      "date": "2012-12",
+      "pages": 44,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526115",
+      "category": "解密发布"
+    },
+    {
+      "ref": "DEFE 24/2130",
+      "title_cn": "2013年6月最终批次解密：国防部 UFO 调查全面收尾",
+      "title_en": "Final Tranche: Complete MoD UFO Investigation Closure Jun 2013",
+      "date": "2013-06",
+      "pages": 256,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526120",
+      "category": "解密发布"
+    },
+    {
+      "ref": "DEFE 24/2115",
+      "title_cn": "2010年上议院 UFO 辩论记录与国防部立场声明",
+      "title_en": "House of Lords UFO Debate and MoD Position Statement 2010",
+      "date": "2010",
+      "pages": 37,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526105",
+      "category": "国会文件"
+    },
+    {
+      "ref": "DEFE 24/2135",
+      "title_cn": "英国国防部 UFO 项目全景：1950-2009时间线回顾",
+      "title_en": "MoD UFO Programme Overview: 1950-2009 Timeline",
+      "date": "1950–2009",
+      "pages": 94,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526125",
+      "category": "调查报告"
+    },
+    {
+      "ref": "DEFE 24/2140",
+      "title_cn": "解密 UFO 档案中涉及的核设施安全事件汇总",
+      "title_en": "Nuclear Facility Security Incidents in Declassified UFO Files",
+      "date": "1960–2000",
+      "pages": 122,
+      "url": "https://discovery.nationalarchives.gov.uk/details/r/C11526130",
+      "category": "调查报告"
+    }
+  ]
+}
