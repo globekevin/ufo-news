@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛸 UFO 全球观测站 — 每日最新发现与分析</title>
+  <meta name="description" content="全球UFO/UAP最新发现与深度分析，每日6条精选，中英文双语，数据来自MUFON、Reddit、五角大楼报告等权威来源。">
+  <meta name="keywords" content="UFO,UAP,不明飞行物,不明异常现象,外星人,地外生命,飞碟,目击报告">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛸</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- 星空画布 -->
+  <canvas id="stars"></canvas>
+
+  <!-- 顶部导航 -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">🛸</span>
+        <div class="logo-text">
+          <h1>UFO 全球观测站</h1>
+          <p class="subtitle">Global UFO Watch — 每日最新发现与分析</p>
+        </div>
+      </div>
+      <div class="header-meta">
+        <span class="update-time" id="updateTime">加载中...</span>
+        <span class="article-count" id="articleCount"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="main-content">
+    <!-- 今日概览 -->
+    <section class="today-overview" id="todayOverview" style="display:none;">
+      <div class="overview-bar">
+        <span class="overview-date" id="overviewDate"></span>
+        <span class="overview-divider">|</span>
+        <span class="overview-desc">今日精选 6 条全球 UFO/UAP 资讯</span>
+      </div>
+    </section>
+
+    <!-- 文章卡片网格 -->
+    <section class="articles-grid" id="articlesGrid">
+      <!-- JS 动态渲染 -->
+      <div class="loading-state" id="loadingState">
+        <div class="loading-spinner"></div>
+        <p>正在加载今日 UFO 资讯...</p>
+      </div>
+    </section>
+
+    <!-- 数据来源说明 -->
+    <section class="sources-footer">
+      <h3>数据来源</h3>
+      <div class="source-tags">
+        <span class="source-tag">Reddit r/UFOs</span>
+        <span class="source-tag">Reddit r/aliens</span>
+        <span class="source-tag">Reddit r/UFOscience</span>
+        <span class="source-tag">Reddit r/HighStrangeness</span>
+        <span class="source-tag">Space.com UFO</span>
+        <span class="source-tag">MUFON 数据库</span>
+      </div>
+      <p class="disclaimer">
+        ⚠ 本网站为资讯聚合平台，内容来源于全球公开数据源，经 DeepSeek AI 翻译为中文。
+        所有内容仅供参考，不代表本站立场。本站不为任何目击报告的真实性背书。
+      </p>
+    </section>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="site-footer">
+    <p>Powered by GitHub Actions · DeepSeek Translation · Daily @ 6:00 AM CST</p>
+    <p class="footer-small">
+      UFO全球观测站 © 2026 · 
+      <a href="https://github.com/cnfish/ufo-news" target="_blank" rel="noopener">GitHub</a>
+    </p>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
