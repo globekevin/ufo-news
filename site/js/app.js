@@ -279,12 +279,10 @@ function createArchiveFileCard(file, idx) {
     '<div class="archive-file-meta-row">' +
       '<span class="archive-file-date">' + (file.date || '') + '</span>' +
       '<span class="archive-file-pages">' + (file.size || '') + '</span>' +
-      '<span class="archive-file-tag">' + (file.category || '档案') + '</span>' +
     '</div>' +
     '<div class="archive-file-bottom">' +
-      '<span style="font-size:11px;color:var(--text-dim)">' + (file.title_en || '').substring(0, 35) + '…</span>' +
-      '<a class="archive-file-dl-btn" href="' + (file.url || '#') + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="在英国国家档案馆 Discovery 查看并下载（免费注册账号）">' +
-        '<span class="archive-file-dl-icon">📥</span> 查看 &amp; 下载' +
+      '<a class="archive-file-dl-btn" href="' + (file.url || '#') + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="在英国国家档案馆 Discovery 查看并下载 PDF">' +
+        '<span class="archive-file-dl-icon">📥</span> 下载 PDF' +
       '</a>' +
     '</div>';
 
