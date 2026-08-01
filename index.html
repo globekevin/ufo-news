@@ -1,83 +1,270 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🛸 UFO 全球观测站 — 每日最新发现与分析</title>
-  <meta name="description" content="全球UFO/UAP最新发现与深度分析，每日6条精选，中英文双语，数据来自MUFON、Reddit、五角大楼报告等权威来源。">
-  <meta name="keywords" content="UFO,UAP,不明飞行物,不明异常现象,外星人,地外生命,飞碟,目击报告">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛸</text></svg>">
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UFO DAILY — 全球不明现象日报</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <!-- 星空画布 -->
-  <canvas id="stars"></canvas>
+<!-- 星空背景 -->
+<canvas id="stars"></canvas>
 
-  <!-- 顶部导航 -->
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="logo">
-        <span class="logo-icon">🛸</span>
-        <div class="logo-text">
-          <h1>UFO 全球观测站</h1>
-          <p class="subtitle">Global UFO Watch — 每日最新发现与分析</p>
-        </div>
+<div id="app-wrapper">
+
+<!-- ========== Header ========== -->
+<header class="header">
+  <div class="logo-group">
+    <img class="logo-icon" src="assets/svg/2_5-20260801_153410294.svg" alt="UFO Daily Logo">
+    <span class="logo-text">UFO DAILY</span>
+  </div>
+  <nav class="nav-links">
+    <a href="#daily" class="nav-link">每日精选</a>
+    <a href="#archive" class="nav-link muted">往期归档</a>
+    <a href="#data" class="nav-link muted">数据洞察</a>
+    <a href="#discover" class="nav-link muted">社区发现</a>
+  </nav>
+  <button class="subscribe-btn">订阅每日推送</button>
+</header>
+
+<!-- ========== Hero ========== -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-left">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        <span class="hero-badge-text" id="heroBadge">正在加载今日数据…</span>
       </div>
-      <div class="header-meta">
-        <span class="update-time" id="updateTime">加载中...</span>
-        <span class="article-count" id="articleCount"></span>
+      <h1 class="hero-title">探索未知，<br>见证真相</h1>
+      <p class="hero-sub">每日清晨6点，从全球权威来源精选6条最新UFO发现与深度分析，<br>全部翻译为中文，让你不错过任何一次接触。</p>
+      <div class="hero-cta-group">
+        <button class="btn-primary" onclick="document.getElementById('daily').scrollIntoView()">浏览今日精选</button>
+        <button class="btn-secondary">了解数据来源</button>
       </div>
     </div>
-  </header>
+    <div class="hero-visual">
+      <img src="assets/images/2_31-20260801_153359576.png" alt="UFO spacecraft over dark starry night">
+    </div>
+  </div>
+</section>
 
-  <!-- 主内容区 -->
-  <main class="main-content">
-    <!-- 今日概览 -->
-    <section class="today-overview" id="todayOverview" style="display:none;">
-      <div class="overview-bar">
-        <span class="overview-date" id="overviewDate"></span>
-        <span class="overview-divider">|</span>
-        <span class="overview-desc">今日精选 6 条全球 UFO/UAP 资讯</span>
+<!-- ========== Daily News ========== -->
+<section class="section" id="daily" style="align-items:center">
+  <div class="section-header">
+    <div class="section-header-left">
+      <span class="section-label">TODAY · 今日精选</span>
+      <h2 class="section-title" id="dailyTitle">今日 6 条发现</h2>
+      <p class="section-meta" id="dailyMeta">数据加载中…</p>
+    </div>
+    <div class="filter-pills">
+      <span class="filter-pill active" data-filter="all">全部</span>
+      <span class="filter-pill" data-filter="sighting">目击事件</span>
+      <span class="filter-pill" data-filter="analysis">深度分析</span>
+      <span class="filter-pill" data-filter="archive">历史档案</span>
+    </div>
+  </div>
+
+  <!-- 加载状态 -->
+  <div id="loadingState" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>正在接收来自全球的 UFO 讯号…</p>
+  </div>
+
+  <!-- 错误状态 -->
+  <div id="errorState" class="error-state" style="display:none">
+    <div class="error-icon">🛸</div>
+    <p id="errorMsg"></p>
+  </div>
+
+  <!-- 新闻卡片网格 -->
+  <div class="card-grid" id="articlesGrid"></div>
+
+  <button class="view-more-btn" onclick="document.getElementById('archive').scrollIntoView()">
+    查看往期所有资讯 <span class="view-more-arrow">→</span>
+  </button>
+</section>
+
+<!-- ========== Archive ========== -->
+<section class="section section-alt" id="archive">
+  <div class="archive-header">
+    <div class="section-header-left">
+      <span class="section-label">ARCHIVE · 往期归档</span>
+      <h2 class="section-title">历史发现数据库</h2>
+      <p class="section-meta" id="archiveMeta">数据加载中…</p>
+    </div>
+    <div class="search-box">
+      <img src="assets/svg/2_128-20260801_153410294.svg" alt="搜索">
+      <input type="text" placeholder="搜索关键词、来源、地区…" id="searchInput">
+    </div>
+  </div>
+
+  <div class="archive-table" id="archiveTable">
+    <div class="archive-table-header">
+      <span class="archive-table-col date">日期</span>
+      <span class="archive-table-col title">标题</span>
+      <span class="archive-table-col source">来源</span>
+      <span class="archive-table-col tag">分类</span>
+    </div>
+    <div id="archiveRows"></div>
+  </div>
+</section>
+
+<!-- ========== Data Viz ========== -->
+<section class="section" id="data">
+  <div class="section-header">
+    <div class="section-header-left">
+      <span class="section-label">DATA · 数据洞察</span>
+      <h2 class="section-title">全球 UFO 目击热力</h2>
+      <p class="section-meta">过去 12 个月 · 持续追踪 47 个国家与地区</p>
+    </div>
+    <span class="section-meta" style="font-family:var(--font-mono)" id="dataUpdateTime"></span>
+  </div>
+
+  <div class="data-stats-row">
+    <div class="stat-card">
+      <span class="stat-label">今日精选</span>
+      <span class="stat-value" id="statToday">6</span>
+      <span class="stat-change">每日 06:00 自动更新</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">数据来源覆盖</span>
+      <span class="stat-value">5+</span>
+      <span class="stat-change">Reddit · Space.com · 多源聚合</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">AI 翻译引擎</span>
+      <span class="stat-value">DeepSeek</span>
+      <span class="stat-change muted">中英双语 · 准确即时</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">更新频率</span>
+      <span class="stat-value">每日</span>
+      <span class="stat-change muted">北京时间 06:00</span>
+    </div>
+  </div>
+
+  <div class="map-panel">
+    <div class="map-left">
+      <span class="map-title-text">全球目击事件分布</span>
+      <p class="map-subtitle-text">圆点大小代表目击事件数量，颜色深度代表事件密度</p>
+      <div class="map-visual">
+        <div class="map-visual-placeholder">🌍 全球 UFO 目击热力地图</div>
       </div>
-    </section>
+    </div>
+    <div class="map-right">
+      <span class="map-right-title">TOP 来源地区</span>
+      <div class="region-row"><span class="region-rank">01</span><div class="region-info"><span class="region-country">美国</span><span class="region-count">NASA · Reddit r/UFOs</span></div><div class="region-bar"></div></div>
+      <div class="region-row"><span class="region-rank">02</span><div class="region-info"><span class="region-country">英国</span><span class="region-count">BBC · MOD 解密档案</span></div><div class="region-bar"></div></div>
+      <div class="region-row"><span class="region-rank">03</span><div class="region-info"><span class="region-country">澳大利亚</span><span class="region-count">ABC · 国防部 FOIA</span></div><div class="region-bar"></div></div>
+      <div class="region-row"><span class="region-rank">04</span><div class="region-info"><span class="region-country">日本</span><span class="region-count">航空自卫队档案</span></div><div class="region-bar"></div></div>
+      <div class="region-row"><span class="region-rank">05</span><div class="region-info"><span class="region-country">智利</span><span class="region-count">CEFAA 官方机构</span></div><div class="region-bar"></div></div>
+    </div>
+  </div>
+</section>
 
-    <!-- 文章卡片网格 -->
-    <section class="articles-grid" id="articlesGrid">
-      <!-- JS 动态渲染 -->
-      <div class="loading-state" id="loadingState">
-        <div class="loading-spinner"></div>
-        <p>正在加载今日 UFO 资讯...</p>
+<!-- ========== Discover ========== -->
+<section class="section section-alt" id="discover">
+  <div class="discover-header">
+    <span class="section-label">COMMUNITY · 社区发现</span>
+    <h2 class="discover-title-text">你亲眼见过吗？</h2>
+    <p class="discover-sub-text">全球已有数千位观察者在此分享了他们的目击记录。<br>上传你的发现，加入这场跨越星际的对话。</p>
+    <div class="hero-cta-group" style="margin-top:4px">
+      <button class="btn-primary">上传我的发现</button>
+      <button class="btn-secondary">浏览社区</button>
+    </div>
+  </div>
+
+  <div class="discover-grid">
+    <div class="discover-card">
+      <div class="discover-user-header">
+        <div class="user-avatar cyan">李</div>
+        <div class="user-info">
+          <span class="user-name">星空观察者 · 北京</span>
+          <span class="user-time">2 小时前</span>
+        </div>
       </div>
-    </section>
-
-    <!-- 数据来源说明 -->
-    <section class="sources-footer">
-      <h3>数据来源</h3>
-      <div class="source-tags">
-        <span class="source-tag">Reddit r/UFOs</span>
-        <span class="source-tag">Reddit r/aliens</span>
-        <span class="source-tag">Reddit r/UFOscience</span>
-        <span class="source-tag">Reddit r/HighStrangeness</span>
-        <span class="source-tag">Space.com UFO</span>
-        <span class="source-tag">MUFON 数据库</span>
+      <p class="discover-content">怀柔山区拍摄到三角形光点，静止悬停约 40 秒后突然垂直上升消失，已提交原始视频文件……</p>
+      <div class="discover-footer">
+        <span class="discover-verify">✓ 待核实</span>
+        <span class="discover-likes">247 关注</span>
       </div>
-      <p class="disclaimer">
-        ⚠ 本网站为资讯聚合平台，内容来源于全球公开数据源，经 DeepSeek AI 翻译为中文。
-        所有内容仅供参考，不代表本站立场。本站不为任何目击报告的真实性背书。
-      </p>
-    </section>
-  </main>
+    </div>
+    <div class="discover-card">
+      <div class="discover-user-header">
+        <div class="user-avatar purple">M</div>
+        <div class="user-info">
+          <span class="user-name en">Mike_Cooper · Sydney</span>
+          <span class="user-time">5 小时前</span>
+        </div>
+      </div>
+      <p class="discover-content en">Three orange orbs in triangular formation over Bondi Beach, silent, iPhone 4K. Duration: ~90 seconds.</p>
+      <div class="discover-footer">
+        <span class="discover-verify">✓ 待核实</span>
+        <span class="discover-likes">412 关注</span>
+      </div>
+    </div>
+    <div class="discover-card">
+      <div class="discover-user-header">
+        <div class="user-avatar gold">Y</div>
+        <div class="user-info">
+          <span class="user-name">yamato_uchu · 大阪</span>
+          <span class="user-time">昨日</span>
+        </div>
+      </div>
+      <p class="discover-content">京都郊外夜间目击，物体圆盘状缓慢旋转后瞬移到云层之上消失。反射出异常颜色……</p>
+      <div class="discover-footer">
+        <span class="discover-verify pending">待核实</span>
+        <span class="discover-likes">189 关注</span>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <!-- 页脚 -->
-  <footer class="site-footer">
-    <p>Powered by GitHub Actions · DeepSeek Translation · Daily @ 6:00 AM CST</p>
-    <p class="footer-small">
-      UFO全球观测站 © 2026 · 
-      <a href="https://github.com/cnfish/ufo-news" target="_blank" rel="noopener">GitHub</a>
-    </p>
-  </footer>
+<!-- ========== Footer ========== -->
+<footer class="footer">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="logo-group">
+        <img class="logo-icon" src="assets/svg/2_281-20260801_153410294.svg" alt="UFO Daily">
+        <span class="logo-text" style="font-size:16px">UFO DAILY</span>
+      </div>
+      <p class="footer-desc">每日清晨 6 点，从全球权威来源精选 6 条 UFO 发现与深度分析，全部翻译为中文。<br>我们相信，真相值得被理解。</p>
+    </div>
+    <div class="footer-col">
+      <span class="footer-col-title">内容</span>
+      <a href="#daily">今日精选</a>
+      <a href="#archive">往期归档</a>
+      <a href="#data">数据洞察</a>
+      <a href="#discover">社区发现</a>
+    </div>
+    <div class="footer-col">
+      <span class="footer-col-title">资源</span>
+      <a href="#">数据来源</a>
+      <a href="#">翻译流程</a>
+      <a href="#">API 文档</a>
+      <a href="#">RSS 订阅</a>
+    </div>
+    <div class="footer-col">
+      <span class="footer-col-title">关于</span>
+      <a href="#">团队介绍</a>
+      <a href="#">联系我们</a>
+      <a href="#">用户协议</a>
+      <a href="#">隐私政策</a>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <span class="footer-copyright">Copyright 2026 UFO DAILY · 每日 06:00 北京时间自动更新</span>
+    <span class="footer-meta">Made with curiosity · somewhere beyond the stars</span>
+  </div>
+</footer>
 
-  <script src="js/app.js"></script>
+</div><!-- /app-wrapper -->
+
+<script src="js/app.js"></script>
 </body>
 </html>
