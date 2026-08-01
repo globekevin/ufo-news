@@ -152,9 +152,7 @@ function createCard(article, idx) {
     '</div>';
 
   card.addEventListener('click', function() {
-    if (article.url && article.url !== '#') {
-      window.open(article.url, '_blank', 'noopener');
-    }
+    window.location.href = 'detail.html?id=' + article.id;
   });
 
   return card;
@@ -285,7 +283,7 @@ function renderArchive(articles) {
   container.querySelectorAll('.archive-row').forEach(function(row, i) {
     row.addEventListener('click', function() {
       var a = articles[i];
-      if (a && a.url) window.open(a.url, '_blank', 'noopener');
+      if (a && a.id) window.location.href = 'detail.html?id=' + a.id;
     });
   });
 }
