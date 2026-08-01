@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UFO 全球观测站 · 今日精选</title>
+<style>
+:root {
+  --bg-deep: #000a14;
+  --bg-card: rgba(10,18,35,0.85);
+  --bg-card-hover: rgba(16,28,52,0.92);
+  --accent: #4fc3f7;
+  --accent-glow: #1e88e5;
+  --gold: #ffd54f;
+  --text: #e0e8f0;
+  --text-dim: #8899aa;
+  --border: rgba(79,195,247,0.15);
+  --tag-official: rgba(255,213,79,0.18);
+  --tag-official-text: #ffd54f;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg-deep);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* ── Canvas BG ── */
+canvas#stars { position:fixed; top:0; left:0; z-index:0; }
+
+/* ── Header ── */
+header {
+  position: relative; z-index:1;
+  text-align: center;
+  padding: 60px 20px 40px;
+}
+header h1 {
+  font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: linear-gradient(135deg, #4fc3f7 0%, #81d4fa 40%, #b3e5fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+header .date-line {
+  margin-top: 12px;
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+header .divider {
+  width: 80px; height: 2px;
+  margin: 24px auto 0;
+  background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
+}
+
+/* ── Grid ── */
+main {
+  position: relative; z-index:1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+@media (max-width: 1024px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+
+/* ── Card ── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 24px 24px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: all 0.35s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+.card:hover { 
+  border-color: rgba(79,195,247,0.35); 
+  background: var(--bg-card-hover);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(30,136,229,0.12);
+}
+.card:hover::before { opacity: 1; }
+
+/* Source Tag */
+.source-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--tag-official);
+  color: var(--tag-official-text);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+  width: fit-content;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+.source-tag::before {
+  content: '▸';
+  font-size: 0.6rem;
+}
+
+/* Title (Chinese) */
+.card .title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #fff;
+  margin-bottom: 12px;
+}
+/* English subtitle */
+.card .title-en {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.4;
+  margin-bottom: 16px;
+  font-style: italic;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Summary */
+.card .summary {
+  font-size: 0.88rem;
+  color: #bcc8d4;
+  line-height: 1.65;
+  flex: 1;
+  margin-bottom: 18px;
+}
+
+/* Source URL link */
+.card .source-link {
+  font-size: 0.7rem;
+  color: var(--accent);
+  text-decoration: none;
+  opacity: 0.6;
+  transition: opacity 0.25s;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-top: 12px;
+  border-top: 1px solid rgba(79,195,247,0.1);
+}
+.card .source-link:hover { opacity: 1; }
+
+/* Footer */
+footer {
+  position: relative; z-index:1;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+}
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<header>
+  <h1>UFO 全球观测站</h1>
+  <div class="date-line">2026 · 08 · 01 ｜ 今日精选</div>
+  <div class="divider"></div>
+</header>
+
+<main>
+  <div class="grid" id="news-grid"></div>
+</main>
+
+<footer>🛸 数据来源：AARO · NASA · NOAA · 五角大楼 · GEIPAN · Black Vault (FOIA) ｜ 翻译：DeepSeek AI</footer>
+
+<script>
+// ═══════════════════════════════════════════
+//  Starfield Canvas
+// ═══════════════════════════════════════════
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+let stars = [];
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+function initStars(n=200) {
+  stars = [];
+  for (let i=0; i<n; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.6 + 0.3,
+      a: Math.random() * 0.7 + 0.3,
+      speed: Math.random() * 0.004 + 0.002,
+    });
+  }
+}
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let s of stars) {
+    s.a += s.speed * (Math.random() > 0.5 ? 1 : -1);
+    s.a = Math.max(0.2, Math.min(1, s.a));
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(180,220,255,${s.a})`;
+    ctx.fill();
+  }
+  requestAnimationFrame(drawStars);
+}
+resize();
+initStars();
+drawStars();
+window.addEventListener('resize', () => { resize(); initStars(); });
+
+// ═══════════════════════════════════════════
+//  Render News Cards
+// ═══════════════════════════════════════════
+const articles = [
+  {
+    id: "aaro-report",
+    source_tag: "AARO · 美国国防部",
+    title_cn: "AARO 发布 2025 财年 UAP 报告：新增 319 起案件，扩大卫星分析",
+    title_en: "AARO Releases FY2025 UAP Report, Citing 319 New Cases and Expanded Satellite Analysis",
+    summary_cn: "美国国防部全域异常解决办公室（AARO）在法定截止日期数月后发布了 2025 财年综合年度报告，记录了 319 份新收到的 UAP 报告，同时强调所有已解决案件最终均归因于常规原因。报告引入卫星数据交叉分析，标志着 UAP 调查进入新阶段。",
+    url: "https://www.theblackvault.com/documentarchive/aaro-releases-fy2025-uap-report/",
+    date: "2026-07-21"
+  },
+  {
+    id: "noaa-gallaudet",
+    source_tag: "NOAA · 美国海洋大气局",
+    title_cn: "前 NOAA 高官加劳德特邮件曝光：美国海洋大气局内部对 UAP 的深层关注",
+    title_en: "What Timothy Gallaudet's NOAA Emails Reveal About His Interest in UAPs",
+    summary_cn: "根据《信息自由法》最新公开的 NOAA 内部邮件，前海洋与大气事务助理部长加劳德特博士在任期间大量检索 UAP 相关信息。这位退役海军少将的邮件为理解美国政府内部对 UAP 问题的严肃态度提供了罕见窗口。",
+    url: "https://www.theblackvault.com/documentarchive/what-timothy-gallaudets-noaa-emails-reveal-about-his-interest-in-uaps/",
+    date: "2026-06-22"
+  },
+  {
+    id: "war-dept-foia",
+    source_tag: "Black Vault · FOIA 解密",
+    title_cn: "战争部以「国家安全」为由，拒绝公开 UAP 评估核心细节",
+    title_en: "Department of War Cites National Security to Hide Core UAP Evaluation Details",
+    summary_cn: "前身为国防部监察长办公室的战争部监察长发布了第四批关于军方 UAP 处理的审查文件，但核心评估结论仍被大段涂黑。FOIA 申请人已提起诉讼，要求法院裁定解密——这一案件可能成为 UAP 透明度运动的关键转折点。",
+    url: "https://www.theblackvault.com/documentarchive/department-of-war-cites-national-security-to-hide-core-uap-evaluation-details/",
+    date: "2026-06-16"
+  },
+  {
+    id: "nasa-disclosure",
+    source_tag: "NASA · 美国航天局",
+    title_cn: "NASA 内部文件曝光：已启动「宣布发现地外生命」的正式沟通预案",
+    title_en: "NASA Documents Show Renewed Internal Planning on How to Announce Discovery of Extraterrestrial Life",
+    summary_cn: "根据最新披露的 NASA 内部文件，该机构在 2025 年召开专题会议，重新审视并制定了「确认发现地外生命后如何公开宣布」的正式沟通协议。这份 FOIA 文件引发外界对重大声明是否临近的激烈讨论。",
+    url: "https://www.theblackvault.com/documentarchive/nasa-documents-show-renewed-internal-planning-on-how-to-announce-discovery-of-extraterrestrial-life/",
+    date: "2026-05-01"
+  },
+  {
+    id: "pentagon-aatip",
+    source_tag: "五角大楼 · DoD",
+    title_cn: "五角大楼 2019 年密件曝光：高层曾紧急协调 AATIP 口径",
+    title_en: "New Emails Reveal Pentagon Effort to Align Messaging on AATIP and Luis Elizondo",
+    summary_cn: "最新公开的 2019 年 5 月五角大楼内部邮件揭示：在 AATIP 前负责人埃利松多公开亮相后，国防部高层紧急协调对外口径，试图将 AATIP 定性为「从未研究 UAP」——这一内部矛盾至今未获解决。",
+    url: "https://www.theblackvault.com/documentarchive/new-emails-reveal-pentagon-effort-to-align-messaging-on-aatip-and-luis-elizondo/",
+    date: "2026-04-27"
+  },
+  {
+    id: "geipan-database",
+    source_tag: "GEIPAN · 法国航天局",
+    title_cn: "法国官方 UFO 调查机构 GEIPAN：全球最完整的政府 UFO 档案",
+    title_en: "GEIPAN — France's Official UAP Investigation Agency Opens Public Case Database",
+    summary_cn: "隶属于法国国家空间研究中心（CNES）的 GEIPAN 自 1977 年持续运作至今，拥有全球最完整的官方 UFO 调查档案。其公开数据库收录了数十年间数千个案件，是学界引用率最高的政府 UAP 数据库之一。",
+    url: "https://www.cnes-geipan.fr/en",
+    date: "持续更新"
+  }
+];
+
+const grid = document.getElementById('news-grid');
+articles.forEach(a => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <span class="source-tag">${a.source_tag}</span>
+    <div class="title">${a.title_cn}</div>
+    <div class="title-en">${a.title_en}</div>
+    <div class="summary">${a.summary_cn}</div>
+    <a class="source-link" href="${a.url}" target="_blank" title="查看原文">🔗 ${new URL(a.url).hostname} · ${a.date}</a>
+  `;
+  grid.appendChild(card);
+});
+</script>
+</body>
+</html>

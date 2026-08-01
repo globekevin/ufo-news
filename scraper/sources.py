@@ -152,11 +152,138 @@ UAP_KEYWORDS = [
     "congressional uap", "senate uap", "whistleblower uap",
 ]
 
+# 目击事件关键词 —— 权重很高，命中越多越优先
+EVENT_KEYWORDS = [
+    # 目击行为
+    "sighting", "spotted", "witness", "witnesses", "witnessed", "observed",
+    "seen over", "seen near", "appeared", "hovering", "flew over",
+    # 视频/照片证据
+    "video", "footage", "photograph", "photo", "filmed", "recorded", "camera",
+    "cellphone", "dashcam", "infrared",
+    # 目击者身份（高可信度）
+    "pilot", "pilots", "commercial pilot", "airline pilot", "military pilot",
+    "astronaut", "police officer", "police", "air force", "navy",
+    "air traffic control", "radar operator", "fighter jet",
+    # 物体形态
+    "orb", "orbs", "disk", "disc", "triangle", "triangular", "tic tac",
+    "cylinder", "cigar", "lights", "formation", "fleet", "swarm",
+    "black triangle", "glowing", "metallic", "sphere", "diamond",
+    # 物理效应
+    "landing", "landed", "trace", "physical evidence", "radiation",
+    "electromagnetic", "emf", "engine failure", "instrument malfunction",
+    # 规模
+    "mass sighting", "multiple witnesses", "dozens of", "hundreds of",
+    "over a city", "over the city",
+    # 知名事件/地点
+    "rendlesham", "phoenix lights", "stephenville", "tic-tac ufo",
+    "gimbal", "go fast", "nimitz", "roosevelt", "omalley",
+    "close encounter", "ce2k", "abduction", "humanoid",
+    "pantex", "nuclear facility", "nuclear", "nuke site",
+    "air force base", "military base", "naval base",
+    "anoka", "virginia beach", "texas",
+    # 最新线索
+    "new footage", "new video", "leaked video", "new sighting",
+    "recent sighting", "unexplained lights", "mysterious object",
+    "unknown craft", "breaking", "eyewitness", "firsthand",
+    "silent", "chased", "pacing", "shadowed",
+    "declassified documents detail", "newly declassified fbi",
+    "declassified files reveal",
+]
+
+# 政策/公文关键词 —— 命中后减权（FOIA/邮件/档案类都要打击）
+POLICY_KEYWORDS = [
+    # 报告/公文
+    "report released", "annual report", "quarterly report", "fiscal year",
+    "fy202", "fy2025", "fy2026", "report to congress",
+    # 听证/简报
+    "hearing", "hearing on", "testimony", "testified", "testifies",
+    "briefing", "briefed", "policy", "legislation", "budget request",
+    "appropriation", "funding", "letter to", "memorandum", "memo",
+    # FOIA / 解密
+    "foia request", "foia release", "foia document", "foia log",
+    "declassified", "declassification", "document dump",
+    # 机构/组织
+    "task force", "office of", "director of", "appointed",
+    "committee", "congressional", "senate", "house",
+    # 内部文件
+    "press release", "statement on", "announces plan", "prepares for",
+    "internal memo", "draft", "proposal", "framework",
+    # 协调/沟通
+    "coordination", "coordinated", "communication plan",
+    "retrieving information", "searched for", "catalog",
+    # 档案/统计
+    "archive", "database", "total of", "statistics",
+    # 邮件
+    "emails reveal", "emails show", "deleted emails", "email archive",
+    "correspondence", "email thread",
+    # 拒绝/上诉
+    "denies appeal", "denies request", "refuses to", "rejects",
+    "appeal denied", "blocked release",
+    # 规划/准备
+    "planning on how to", "prepares to", "internal planning",
+    "developing plan", "contingency plan",
+    # FAQ / 百科型（非新闻）
+    "what are they", "what are ufos", "most famous sightings",
+    "what is a ufo", "explainer", "everything you need to know",
+    "complete guide", "history of ufo", "ufo 101",
+    # 排名/统计型
+    "most ufo sightings", "cities with the most", "top 10",
+    "where yours ranks", "states with the most",
+]
+
 
 def _is_uap_article(title: str, summary: str) -> bool:
     """判断文章是否与 UAP/UFO 相关"""
     text = (title + " " + summary).lower()
     return any(kw in text for kw in UAP_KEYWORDS)
+
+
+def _compute_event_score(title: str, summary: str) -> float:
+    """
+    计算「目击事件感」分数。
+    正值 = 事件型内容，负值 = 政策型内容。
+    用于精选排序而非筛选（所有 UAP 文章都可能入选）。
+    """
+    text = (title + " " + summary).lower()
+    score = 0.0
+
+    # 事件关键词加分
+    for kw in EVENT_KEYWORDS:
+        if kw in text:
+            # 视频/照片证据权重更高
+            if kw in ("video", "footage", "photograph", "photo", "filmed", "recorded"):
+                score += 0.6
+            # 目击者身份高可信度
+            elif kw in ("pilot", "pilots", "military pilot", "air force", "navy",
+                        "astronaut", "police officer"):
+                score += 0.5
+            # 规模类
+            elif kw in ("mass sighting", "multiple witnesses", "dozens of", "hundreds of"):
+                score += 0.5
+            # 物理证据
+            elif kw in ("landing", "landed", "trace", "physical evidence", "radiation"):
+                score += 0.5
+            # 知名事件
+            elif kw in ("rendlesham", "phoenix lights", "nimitz", "tic-tac ufo",
+                        "gimbal", "go fast", "close encounter", "abduction"):
+                score += 0.5
+            # 最新/突发
+            elif kw in ("new footage", "new video", "leaked video", "new sighting",
+                        "breaking", "recent sighting"):
+                score += 0.5
+            # 物体形态
+            elif kw in ("orb", "orbs", "disk", "disc", "triangle", "triangle", "lights",
+                        "formation", "fleet", "swarm"):
+                score += 0.35
+            else:
+                score += 0.3
+
+    # 政策关键词减分
+    for kw in POLICY_KEYWORDS:
+        if kw in text:
+            score -= 0.35
+
+    return round(score, 2)
 
 
 def _fetch_blackvault_rss() -> list[Article]:
@@ -315,76 +442,115 @@ NUFORC_ALT_INDEX = "https://nuforc.org/ndx/?id=event"
 
 def _fetch_nuforc() -> list[Article]:
     """
-    从 NUFORC 月度索引页抓取最新月份的目击报告统计。
-    优先用 webreports 路径，降级用 ndx 路径。
+    从 NUFORC 获取最新目击事件。
+    优先抓取「目击事件摘要」页面，降级用月度统计。
+    NUFORC Sighting Reports: https://nuforc.org/webreports/ndxevent.html
     """
     articles = []
-    resp = _try_get(NUFORC_MONTHLY_INDEX)
-    if not resp:
-        resp = _try_get(NUFORC_ALT_INDEX)
 
-    monthly_data = []
-
-    if resp:
+    # 先尝试抓取事件摘要页（包含具体目击描述）
+    event_resp = _try_get("https://nuforc.org/webreports/ndxevent.html")
+    if event_resp:
         try:
-            soup = BeautifulSoup(resp.content, "lxml")
-            # 尝试多种表格/列表结构
-            rows = soup.select("table tr, .data-table tr, ul li, p")
-            for row in rows:
-                text = row.get_text(strip=True)
-                # 匹配各种格式: "2026/07 204", "2026/07 - 204", "07/2026 (204)"
-                match = re.match(r"(\d{4})\s*[/-]\s*(\d{2})\D+(\d+)", text)
-                if not match:
-                    match = re.match(r"(\d{2})\s*[/-]\s*(\d{4})\D+(\d+)", text)
-                    if match:
-                        mo, yr, cnt = int(match.group(1)), int(match.group(2)), int(match.group(3))
-                    else:
-                        continue
-                else:
-                    yr, mo, cnt = int(match.group(1)), int(match.group(2)), int(match.group(3))
+            soup = BeautifulSoup(event_resp.content, "lxml")
+            # 尝试从链接中提取近期事件
+            event_rows = soup.select("table tr")[:30]
+            found_events = []
+            for row in event_rows:
+                cells = row.select("td")
+                if len(cells) >= 2:
+                    link_el = row.select_one("a[href]")
+                    if link_el:
+                        date_text = cells[0].get_text(strip=True)
+                        location_text = cells[1].get_text(strip=True) if len(cells) > 1 else ""
+                        desc_text = cells[2].get_text(strip=True) if len(cells) > 2 else ""
+                        href = link_el.get("href", "")
+                        if href and len(date_text) > 5:
+                            found_events.append({
+                                "date": date_text,
+                                "location": location_text,
+                                "desc": desc_text,
+                                "url": urljoin(NUFORC_MONTHLY_INDEX, href),
+                            })
 
-                if 1900 < yr < 2100 and 1 <= mo <= 12 and cnt > 0:
-                    monthly_data.append({
-                        "year": yr, "month": mo, "count": cnt,
-                        "link": f"https://nuforc.org/webreports/ndxe{yr}{mo:02d}.html",
-                    })
+            # 取最近 2 条有描述的目击事件
+            event_count = 0
+            for ev in found_events[:3]:
+                if ev["desc"] and len(ev["desc"]) > 15:
+                    title = f"目击报告: {ev['location']} — {ev['desc'][:60]}"
+                    summary = (
+                        f"NUFORC 收到来自 {ev['location']} 的目击报告"
+                        f"（{ev['date']}）。报告描述: {ev['desc'][:250]}。"
+                        f"NUFORC 正在对该事件进行进一步调查核实。"
+                    )
+                    articles.append(Article(
+                        title=title,
+                        url=ev["url"],
+                        summary=summary,
+                        source_name="NUFORC (美国目击报告中心)",
+                        published=datetime.now(),
+                        score=3.8,
+                    ))
+                    event_count += 1
+                    if event_count >= 2:
+                        break
         except Exception as e:
-            logger.warning(f"NUFORC parse error: {e}")
+            logger.warning(f"NUFORC events parse error: {e}")
 
-    # 如果抓取失败，使用已知的近期数据
-    if not monthly_data:
-        now = datetime.now()
-        monthly_data = [
-            {"year": now.year, "month": now.month - 1 if now.month > 1 else 12,
-             "count": 200, "link": "https://nuforc.org/webreports/ndxevent.html"},
-            {"year": now.year, "month": now.month - 2 if now.month > 2 else (12 - (2 - now.month)),
-             "count": 280, "link": "https://nuforc.org/webreports/ndxevent.html"},
-        ]
+    # 降级：用月度统计
+    if not articles:
+        monthly_data = []
+        resp = _try_get(NUFORC_MONTHLY_INDEX)
+        if not resp:
+            resp = _try_get(NUFORC_ALT_INDEX)
 
-    # 排序取最近 2 个月
-    monthly_data.sort(key=lambda x: (x["year"], x["month"]), reverse=True)
-    recent = monthly_data[:2]
+        if resp:
+            try:
+                soup = BeautifulSoup(resp.content, "lxml")
+                rows = soup.select("table tr, .data-table tr, ul li, p")
+                for row in rows:
+                    text = row.get_text(strip=True)
+                    match = re.match(r"(\d{4})\s*[/-]\s*(\d{2})\D+(\d+)", text)
+                    if not match:
+                        match = re.match(r"(\d{2})\s*[/-]\s*(\d{4})\D+(\d+)", text)
+                        if match:
+                            mo, yr, cnt = int(match.group(1)), int(match.group(2)), int(match.group(3))
+                        else:
+                            continue
+                    else:
+                        yr, mo, cnt = int(match.group(1)), int(match.group(2)), int(match.group(3))
 
-    for md in recent:
-        month_name = f"{md['year']}年{md['month']}月"
-        title = f"NUFORC {month_name}目击报告：收录 {md['count']}+ 份"
-        summary = (
-            f"美国国家 UFO 报告中心（NUFORC）在 {month_name} "
-            f"共收录超过 {md['count']} 份 UAP/UFO 目击报告，涵盖全美各州的公众、"
-            f"执法人员及军事人员目击事件。自 1974 年成立以来，数据库已累计收录 "
-            f"17 万+ 条目击记录，全部可免费在线查询，无需注册。"
-        )
+                    if 1900 < yr < 2100 and 1 <= mo <= 12 and cnt > 0:
+                        monthly_data.append({
+                            "year": yr, "month": mo, "count": cnt,
+                            "link": f"https://nuforc.org/webreports/ndxe{yr}{mo:02d}.html",
+                        })
+            except Exception as e:
+                logger.warning(f"NUFORC parse error: {e}")
 
-        articles.append(Article(
-            title=title,
-            url=md["link"],
-            summary=summary,
-            source_name="NUFORC (美国国家 UFO 报告中心)",
-            published=datetime(md["year"], md["month"], 15),
-            score=3.5,
-        ))
+        if not monthly_data:
+            now = datetime.now()
+            monthly_data = [
+                {"year": now.year, "month": now.month - 1 if now.month > 1 else 12,
+                 "count": 200, "link": "https://nuforc.org/webreports/ndxevent.html"},
+            ]
 
-    logger.info(f"  NUFORC: {len(articles)} monthly reports")
+        monthly_data.sort(key=lambda x: (x["year"], x["month"]), reverse=True)
+        for md in monthly_data[:1]:
+            month_name = f"{md['year']}年{md['month']}月"
+            articles.append(Article(
+                title=f"NUFORC {month_name}目击报告：收录 {md['count']}+ 份",
+                url=md["link"],
+                summary=(
+                    f"美国国家 UFO 报告中心（NUFORC）在 {month_name} "
+                    f"共收录超过 {md['count']} 份 UAP/UFO 目击报告。"
+                ),
+                source_name="NUFORC (美国目击报告中心)",
+                published=datetime(md["year"], md["month"], 15),
+                score=2.5,
+            ))
+
+    logger.info(f"  NUFORC: {len(articles)} items")
     return articles
 
 
@@ -789,7 +955,133 @@ def _fetch_cufos() -> list[Article]:
 
 
 # ═══════════════════════════════════════════════════════════════
-# Reddit 降级源（保底，当权威源都不可用时启用）
+# 源 #10: Google News — 「UFO sighting」搜索（事件型新闻）
+# ═══════════════════════════════════════════════════════════════
+
+GOOGLE_NEWS_UFO_RSS = "https://news.google.com/rss/search?q=UFO+sighting&hl=en-US&gl=US&ceid=US:en"
+
+
+def _fetch_google_news_ufo() -> list[Article]:
+    """从 Google News RSS 抓取最新 UFO 目击事件新闻"""
+    articles = []
+    resp = _try_get(GOOGLE_NEWS_UFO_RSS)
+    if not resp:
+        logger.debug("Google News RSS unreachable")
+        return articles
+
+    try:
+        feed = feedparser.parse(resp.content)
+        for entry in feed.entries[:20]:
+            title = entry.get("title", "")
+            link = entry.get("link", "")
+            if not title or not link:
+                continue
+
+            raw_desc = entry.get("summary", "") or entry.get("description", "")
+            summary = _clean_html(raw_desc)[:350]
+
+            # 跳过纯政策/报告类
+            if not _is_uap_article(title, summary):
+                continue
+
+            # 提取来源（Google News 标题格式: "Title - SourceName"）
+            source_name = "新闻聚合"
+            pub = entry.get("source", {})
+            if pub and pub.get("title"):
+                source_name = pub["title"]
+
+            published = datetime.now()
+            if hasattr(entry, "published_parsed") and entry.published_parsed:
+                try:
+                    published = datetime(*entry.published_parsed[:6])
+                except Exception:
+                    pass
+
+            hours_ago = max(0, (datetime.now() - published).total_seconds() / 3600)
+            score = 3.5 + max(0, 72 - hours_ago) * 0.04
+
+            articles.append(Article(
+                title=title,
+                url=link,
+                summary=summary,
+                source_name=f"📰 {source_name}",
+                published=published,
+                score=score,
+                raw_description=raw_desc,
+            ))
+    except Exception as e:
+        logger.warning(f"Google News RSS parse error: {e}")
+
+    logger.info(f"  Google News UFO: {len(articles)} articles")
+    return articles
+
+
+# ═══════════════════════════════════════════════════════════════
+# 源 #11: MUFON 最新案例（目击事件）
+# ═══════════════════════════════════════════════════════════════
+
+MUFON_CASES_URL = "https://www.mufon.com/ufo-sightings-recent.html"
+
+
+def _fetch_mufon_cases() -> list[Article]:
+    """从 MUFON 最新目击案例页抓取"""
+    articles = []
+    resp = _try_get(MUFON_CASES_URL)
+    if not resp:
+        resp = _try_get("https://www.mufon.com/last-20-sightings")
+
+    if not resp:
+        logger.debug("MUFON cases unreachable")
+        return articles
+
+    try:
+        soup = BeautifulSoup(resp.content, "lxml")
+        for item in soup.select(".sighting-item, .case-item, .report-item, tr")[:10]:
+            cells = item.select("td")
+            if len(cells) >= 2:
+                date_cell = cells[0].get_text(strip=True)
+                location_cell = cells[1].get_text(strip=True)
+                desc_cell = cells[2].get_text(strip=True) if len(cells) > 2 else ""
+                if date_cell and location_cell and len(desc_cell) > 15:
+                    title = f"MUFON 目击报告: {location_cell} — {desc_cell[:50]}"
+                    summary = f"目击日期: {date_cell}，地点: {location_cell}。{desc_cell[:200]}（来源: MUFON 案件数据库）"
+                    articles.append(Article(
+                        title=title,
+                        url=MUFON_CASES_URL,
+                        summary=summary,
+                        source_name="MUFON (目击案例)",
+                        published=datetime.now(),
+                        score=3.0,
+                    ))
+                    continue
+
+            # Fallback: general selectors
+            title_el = item.select_one("h3 a, h4 a, .title a")
+            if not title_el:
+                continue
+            title = title_el.get_text(strip=True)
+            link = title_el.get("href", "")
+            if link and not link.startswith("http"):
+                link = urljoin(MUFON_CASES_URL, link)
+
+            desc_el = item.select_one("p, .desc, .description")
+            summary = desc_el.get_text(strip=True)[:250] if desc_el else ""
+
+            if any(kw in (title + summary).lower() for kw in ["sighting", "witness", "report", "case"]):
+                articles.append(Article(
+                    title=title,
+                    url=link,
+                    summary=summary,
+                    source_name="MUFON (目击案例)",
+                    score=3.0,
+                ))
+    except Exception as e:
+        logger.warning(f"MUFON cases parse error: {e}")
+
+    logger.info(f"  MUFON Cases: {len(articles)} items")
+    return articles
+
+
 # ═══════════════════════════════════════════════════════════════
 
 def _fetch_reddit_fallback() -> list[Article]:
@@ -849,17 +1141,19 @@ def _fetch_reddit_fallback() -> list[Article]:
 # 所有抓取函数及其来源权重（用于最终精选）
 SOURCE_FETCHERS = [
     # 名称                    函数                      权重   是否必需
-    ("BlackVault RSS",        _fetch_blackvault_rss,   5.0,   True),
-    ("BlackVault HTML",       _fetch_blackvault_html,  3.0,   False),  # RSS 的降级
+    ("BlackVault RSS",        _fetch_blackvault_rss,   3.0,   True),
+    ("BlackVault HTML",       _fetch_blackvault_html,  2.0,   False),  # RSS 的降级
     ("NUFORC",                _fetch_nuforc,           3.5,   True),
-    ("NASA UAP",              _fetch_nasa_uap,         4.0,   True),
-    ("FBI Vault",             _fetch_fbi_vault,        2.5,   False),
-    ("CIA Reading Room",      _fetch_cia_readingroom,  2.5,   False),
-    ("GEIPAN",                _fetch_geipan,           4.0,   True),
-    ("UK National Archives",  _fetch_uk_archives,      3.5,   False),
-    ("MUFON",                 _fetch_mufon,            2.5,   False),
-    ("CUFOS",                 _fetch_cufos,            2.5,   False),
-    ("Reddit (降级)",          _fetch_reddit_fallback,  1.0,   False),
+    ("NASA UAP",              _fetch_nasa_uap,         3.0,   True),
+    ("FBI Vault",             _fetch_fbi_vault,        2.0,   False),
+    ("CIA Reading Room",      _fetch_cia_readingroom,  2.0,   False),
+    ("GEIPAN",                _fetch_geipan,           3.0,   True),
+    ("UK National Archives",  _fetch_uk_archives,      2.5,   False),
+    ("MUFON",                 _fetch_mufon,            2.0,   False),
+    ("CUFOS",                 _fetch_cufos,            2.0,   False),
+    ("Google News UFO",       _fetch_google_news_ufo,  4.5,   True),
+    ("MUFON Cases",           _fetch_mufon_cases,      3.5,   True),
+    ("Reddit (降级)",          _fetch_reddit_fallback,  2.0,   False),
 ]
 
 
@@ -897,8 +1191,15 @@ def fetch_all_sources() -> list[Article]:
         # 请求间隔
         time.sleep(1.5 if required else 0.8)
 
-    # 按分数降序排列
-    all_articles.sort(key=lambda x: x.score, reverse=True)
+    # 计算每条文章的「目击事件感」分数
+    for a in all_articles:
+        event_score = _compute_event_score(a.title, a.summary)
+        a.event_score = event_score
+        # 综合权重：事件感权重 4x，压过来源权重差异
+        a.sort_score = a.score + event_score * 4.0
+
+    # 按综合分数降序排列
+    all_articles.sort(key=lambda x: x.sort_score, reverse=True)
 
     logger.info(f"Total unique articles from {len(seen_urls)} unique URLs")
     return all_articles
@@ -907,31 +1208,110 @@ def fetch_all_sources() -> list[Article]:
 def pick_top_articles(articles: list[Article], count: int = 6) -> list[Article]:
     """
     从文章列表中精选 top N 条。
-    策略：
-    1. 第一轮：每个来源取最高分的 1 条（保证多样性）
-    2. 第二轮：补齐剩余位置（按分数）
+
+    策略（事件优先 + 来源多样性）：
+    1. 事件型（event_score > 0）优先于政策型（event_score <= 0）
+    2. 同类内部按综合分数 sort_score 排序
+    3. 保证来源多样性（同一来源最多 1 条）
+    4. 如果事件型不够 N 条，用政策型补齐
+
+    IMPORTANT: 优先选「目击事件」而非「政府政策」。
     """
     if len(articles) <= count:
         return articles
 
+    # 过滤 FAQ/百科型文章
+    def _is_faq(article: Article) -> bool:
+        title_low = article.title.lower()
+        faq_markers = ["what are", "what is a", "most famous", "explainer",
+                       "everything you need", "complete guide", "history of",
+                       "where yours ranks", "cities with the most", "top 10",
+                       "these 20", "states with the"]
+        return any(m in title_low for m in faq_markers)
+
+    articles = [a for a in articles if not _is_faq(a)]
+
+    # 分成事件型和政策型两组
+    event_articles = [a for a in articles if getattr(a, 'event_score', 0) > 0]
+    policy_articles = [a for a in articles if getattr(a, 'event_score', 0) <= 0]
+
+    event_articles.sort(key=lambda x: x.sort_score, reverse=True)
+    policy_articles.sort(key=lambda x: x.sort_score, reverse=True)
+
     selected: list[Article] = []
-    used_sources: set[str] = set()
+    used_source_groups: set[str] = set()
+    used_event_topics: set[str] = set()
 
-    # 第一轮：来源多样性
-    for a in articles:
+    def _source_group(article: Article) -> str:
+        src = article.source_name.split("(")[0].strip()
+        parts = src.split(" ")
+        return " ".join(parts[:2]).lower()
+
+    def _event_topic(article: Article) -> str:
+        """提取事件核心主题（地点/关键词，用于去重）"""
+        title = article.title.lower()
+        for loc in ["anoka", "pantex", "virginia beach", "texas nuke",
+                     "rendlesham", "phoenix", "stephenville", "nimitz"]:
+            if loc in title:
+                return loc
+        for kw in ["pilot encounter", "police officer", "police officers",
+                    "nuclear facility", "air force base", "naval base"]:
+            if kw in title:
+                return kw
+        return ""
+
+    # 第一轮：事件型（多样性 + 同一事件去重）
+    for a in event_articles:
         if len(selected) >= count:
             break
-        # 按来源主机构分组（如 "AARO" 和 "AARO (美国国防部)" 归为一组）
-        source_group = a.source_name.split("(")[0].strip().split(" ")[0]
-        if source_group not in used_sources:
-            selected.append(a)
-            used_sources.add(source_group)
+        sg = _source_group(a)
+        et = _event_topic(a)
+        if sg in used_source_groups:
+            continue
+        if et and et in used_event_topics:
+            continue
+        selected.append(a)
+        used_source_groups.add(sg)
+        if et:
+            used_event_topics.add(et)
 
-    # 第二轮：补满
-    for a in articles:
-        if len(selected) >= count:
-            break
-        if a not in selected:
-            selected.append(a)
+    # 第二轮：事件型补齐（不限多样性，但继续去重）
+    if len(selected) < count:
+        for a in event_articles:
+            if len(selected) >= count:
+                break
+            if a not in selected:
+                et = _event_topic(a)
+                if et and et in used_event_topics:
+                    continue
+                selected.append(a)
+                if et:
+                    used_event_topics.add(et)
+
+    # 第三轮：政策型补齐
+    if len(selected) < count:
+        for a in policy_articles:
+            if len(selected) >= count:
+                break
+            sg = _source_group(a)
+            if sg not in used_source_groups:
+                selected.append(a)
+                used_source_groups.add(sg)
+
+    # 第四轮：政策型不限多样性
+    if len(selected) < count:
+        for a in policy_articles:
+            if len(selected) >= count:
+                break
+            if a not in selected:
+                selected.append(a)
+
+    for i, a in enumerate(selected, 1):
+        es = getattr(a, 'event_score', 0)
+        tag = "🔥事件" if es > 0 else "📄政策"
+        logger.info(
+            f"  Selected #{i} [{tag} event={es:.1f} sort={a.sort_score:.1f}] "
+            f"{a.source_name}: {a.title[:60]}"
+        )
 
     return selected[:count]
