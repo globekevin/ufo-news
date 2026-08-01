@@ -1,0 +1,85 @@
+{
+  "updated": "2026-08-01T15:00:48.409856",
+  "date": "2026-08-01",
+  "count": 6,
+  "articles": [
+    {
+      "id": "fallback-1",
+      "title": "UFO News Headline #1",
+      "url": "#",
+      "summary": "",
+      "image_url": "",
+      "source_name": "〓 系统公告 〓",
+      "published": "2026-08-01T15:00:48.409721",
+      "score": 0,
+      "title_cn": "五角大楼发布最新 UAP 年度报告：数百起未解事件持续追踪",
+      "summary_cn": "美国国防部全域异常解析办公室（AARO）公布了年度不明异常现象报告，记录了数百起军事人员目击事件，其中多起仍无法用常规手段解释，引发新一轮国会关注。",
+      "local_image": ""
+    },
+    {
+      "id": "fallback-2",
+      "title": "UFO News Headline #2",
+      "url": "#",
+      "summary": "",
+      "image_url": "",
+      "source_name": "〓 系统公告 〓",
+      "published": "2026-08-01T15:00:48.409721",
+      "score": 0,
+      "title_cn": "NASA UAP 独立研究小组发布最终建议：呼吁建立科学观测网络",
+      "summary_cn": "NASA 任命的不明异常现象独立研究小组在最终报告中建议，应利用现有科学基础设施建立系统化 UAP 数据采集与分析框架，而非依赖零星军事报告。",
+      "local_image": ""
+    },
+    {
+      "id": "fallback-3",
+      "title": "UFO News Headline #3",
+      "url": "#",
+      "summary": "",
+      "image_url": "",
+      "source_name": "〓 系统公告 〓",
+      "published": "2026-08-01T15:00:48.409721",
+      "score": 0,
+      "title_cn": "前空军情报官国会证词：美国政府持有「非人类」飞行器残骸",
+      "summary_cn": "前空军情报官员 David Grusch 在国会听证会上宣誓作证，声称美国政府秘密运行着一个数十年的「非人类技术逆向工程」计划，已回收多具非人类生物遗骸。",
+      "local_image": ""
+    },
+    {
+      "id": "fallback-4",
+      "title": "UFO News Headline #4",
+      "url": "#",
+      "summary": "",
+      "image_url": "",
+      "source_name": "〓 系统公告 〓",
+      "published": "2026-08-01T15:00:48.409721",
+      "score": 0,
+      "title_cn": "智利 CEFAA 机构公开最新 UFO 案例：红外摄像机捕获高速目标",
+      "summary_cn": "智利民用航空局下属的异常空中现象研究委员会（CEFAA）公布了一段由军用红外摄像机拍摄的视频，显示一个高速移动且无明显推进装置的目标。",
+      "local_image": ""
+    },
+    {
+      "id": "fallback-5",
+      "title": "UFO News Headline #5",
+      "url": "#",
+      "summary": "",
+      "image_url": "",
+      "source_name": "〓 系统公告 〓",
+      "published": "2026-08-01T15:00:48.409721",
+      "score": 0,
+      "title_cn": "哈佛天文学家 Avi Loeb：星际流星残骸回收取得初步成果",
+      "summary_cn": "「伽利略计划」负责人 Avi Loeb 教授宣布，其团队在太平洋海底回收的 IM1 流星残骸中发现了异常元素比例，可能指向星际技术来源，论文已提交同行评审。",
+      "local_image": ""
+    },
+    {
+      "id": "fallback-6",
+      "title": "UFO News Headline #6",
+      "url": "#",
+      "summary": "",
+      "image_url": "",
+      "source_name": "〓 系统公告 〓",
+      "published": "2026-08-01T15:00:48.409721",
+      "score": 0,
+      "title_cn": "英国国防部解密 UFO「X档案」最后一卷：跨越 50 年的官方记录",
+      "summary_cn": "英国国家档案馆公布了国防部 UFO 档案的最终批次，涵盖 1950 年至 2009 年间收到的全部不明飞行物报告，其中包含多名警察和军事飞行员的第一手目击记录。",
+      "local_image": ""
+    }
+  ]
+}

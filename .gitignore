@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Images (generated daily, not tracked in git)
+site/img/*.jpg
+site/img/*.png
+
+# Environment
+.env
+.env.local
