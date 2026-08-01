@@ -17,7 +17,7 @@ from typing import Optional
 import requests
 from PIL import Image
 
-from sources import fetch_all_sources, pick_top_articles
+from sources import fetch_all_sources, pick_top_articles, enrich_article_body, Article
 from translator import translate_articles
 
 # ── 配置 ────────────────────────────────────────────────────
@@ -165,7 +165,7 @@ def main():
     logger.info("=" * 60)
 
     # 1. 抓取
-    logger.info("[1/4] Fetching from all sources...")
+    logger.info("[1/5] Fetching from all sources...")
     all_articles = fetch_all_sources()
 
     if not all_articles:
@@ -175,18 +175,23 @@ def main():
         return
 
     # 2. 精选
-    logger.info("[2/4] Selecting top articles...")
-    top = pick_top_articles(all_articles, MAX_ARTICLES)
-    articles_data = [a.to_dict() for a in top]
-    for i, ad in enumerate(articles_data, 1):
-        logger.info(f"  {i}. [{ad['source_name']}] {ad['title'][:70]}")
+    logger.info("[2/5] Selecting top articles...")
+    top: list[Article] = pick_top_articles(all_articles, MAX_ARTICLES)
+    for a in top:
+        logger.info(f"  {top.index(a)+1}. [{a.source_name}] {a.title[:70]}")
 
-    # 3. 翻译
-    logger.info("[3/4] Translating via DeepSeek...")
+    # 3. 补正文
+    logger.info("[3/4] Enriching article bodies...")
+    for a in top:
+        enrich_article_body(a)
+    articles_data = [a.to_dict() for a in top]
+
+    # 4. 翻译
+    logger.info("[4/4] Translating via DeepSeek...")
     articles_data = translate_articles(articles_data)
 
-    # 4. 下载图片
-    logger.info("[4/4] Downloading images...")
+    # 5. 下载图片
+    logger.info("[5/5] Downloading images...")
     SITE_IMG_DIR.mkdir(parents=True, exist_ok=True)
     for ad in articles_data:
         if ad.get("image_url"):

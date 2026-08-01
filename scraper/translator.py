@@ -16,18 +16,25 @@ DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"
 DEEPSEEK_MODEL = "deepseek-chat"
 
 # 翻译提示词模板
-TRANSLATION_SYSTEM_PROMPT = """你是一位专业的 UFO/UAP 领域新闻翻译专家。请将以下英文新闻标题和导语翻译成中文。
+TRANSLATION_SYSTEM_PROMPT = """你是一位专业的 UFO/UAP 领域新闻翻译与编辑专家。请处理以下英文新闻。
 
-要求：
-1. 标题翻译要简洁有力，保留原文的信息量和冲击力
-2. 导语翻译要流畅自然，符合中文阅读习惯
-3. 专业术语保持准确（如 UAP=不明空中现象, UFO=不明飞行物, Pentagon=五角大楼, whistleblower=吹哨人/举报人, congressional hearing=国会听证会, disclosure=披露）
-4. 人名、地名、机构名保留英文原名并用括号注明中文
-5. 如果原文是美国政府/军方相关的内容，保持严肃客观的语调
-6. 如果原文是目击报告类，可以适当生动但不过度渲染
+**核心任务：为每条新闻生成中文新闻正文（body_cn）。** 规则如下：
 
-只输出 JSON 格式，不要输出其他内容：
-[{"title": "原文标题", "title_cn": "中文标题", "summary": "原文导语", "summary_cn": "中文导语"}]"""
+1. **如果提供了英文正文（body 字段有内容）**：直接翻译成流畅的中文新闻正文。保持原文信息量和叙事结构，段落自然分段。不要添加原文没有的信息。
+
+2. **如果只提供了标题（body 字段为空或很短）**：基于标题和导语，撰写一段 100-200 字的中文新闻正文。保持客观新闻语调，不要虚构细节，可以从 UFO/UAP 领域的常识角度补充简要背景。目的是让读者在详情页看到一段像样的新闻正文，而不是只有一句话。
+
+**其他翻译要求：**
+- title_cn：标题翻译要简洁有力，保留原文的信息量和冲击力
+- summary_cn：导语翻译，1-2 句话，流畅自然
+- body_cn：新闻正文。如果原文有 body 就翻译，没有就基于标题扩写。
+- 绝不翻译配图说明（如 "A photo of..."、"Image credit:"、"©"）、作者署名、发布日期、分享按钮等非正文内容
+- 专业术语：UAP=不明空中现象, UFO=不明飞行物, Pentagon=五角大楼, FOIA=信息自由法, witness=目击者, nuke=核设施, pilot=飞行员
+- 人名地名机构名保留英文原名并括号注明中文
+- 美国政府/军方内容保持严肃客观；目击报告可适当生动但不渲染
+
+只输出 JSON，格式如下：
+[{"title": "…", "title_cn": "…", "summary": "…", "summary_cn": "…", "body_cn": "…"}]"""
 
 
 def _call_deepseek(system_prompt: str, user_prompt: str, api_key: str) -> str:
@@ -82,9 +89,13 @@ def translate_articles(articles: list[dict], api_key: str = "") -> list[dict]:
     # 构建翻译请求 —— 一次翻译 6 条，节省 API 调用
     items = []
     for a in articles:
+        body = a.get("body", "")[:2000]  # 正文截取前 2000 字符
+        has_body = len(body) > 60  # 是否有足够的原文正文
         items.append({
             "title": a.get("title", ""),
             "summary": a.get("summary", ""),
+            "body": body if has_body else "(仅有标题，请基于标题和导语扩展中文正文)",
+            "has_body": has_body,
         })
 
     user_prompt = json.dumps(items, ensure_ascii=False)
@@ -108,6 +119,7 @@ def translate_articles(articles: list[dict], api_key: str = "") -> list[dict]:
                 if i < len(articles):
                     articles[i]["title_cn"] = t.get("title_cn", articles[i].get("title", ""))
                     articles[i]["summary_cn"] = t.get("summary_cn", articles[i].get("summary", ""))
+                    articles[i]["body_cn"] = t.get("body_cn", articles[i].get("body", ""))
 
             logger.info(f"Translated {len(translated)} articles via DeepSeek")
             return articles

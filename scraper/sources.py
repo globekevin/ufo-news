@@ -63,6 +63,7 @@ class Article:
         published: Optional[datetime] = None,
         score: float = 0.0,
         raw_description: str = "",
+        body: str = "",
     ):
         self.title = title.strip()
         self.url = url
@@ -72,6 +73,7 @@ class Article:
         self.published = published or datetime.now()
         self.score = score
         self.raw_description = raw_description.strip()
+        self.body = body.strip()  # 完整正文（爬取原文所得）
 
     @property
     def id(self) -> str:
@@ -88,14 +90,207 @@ class Article:
             "title": self.title,
             "url": self.url,
             "summary": self.summary,
+            "body": self.body,
             "image_url": self.image_url,
             "source_name": self.source_name,
             "published": self.published.isoformat(),
             "score": self.score,
             "title_cn": "",
             "summary_cn": "",
+            "body_cn": "",
             "local_image": "",
         }
+
+
+# ═══════════════════════════════════════════════════════════════
+# 正文提取 — 抓取原文网页正文，过滤配图说明
+# ═══════════════════════════════════════════════════════════════
+
+# 配图说明 / caption 过滤正则
+CAPTION_PATTERNS = [
+    re.compile(r"^(Image|Photo|Picture|Screenshot|Video)(\s+credit|\s+courtesy|\s+by|\s+of)?[\s:：].*", re.IGNORECASE),
+    re.compile(r"^©\s.*", re.IGNORECASE),
+    re.compile(r"^A (photo|picture|screenshot|still|image|frame|video) (of|shows|from).*", re.IGNORECASE),
+    re.compile(r"^\[Image[:\]]", re.IGNORECASE),
+    re.compile(r"^Fig\.\s*\d+[\s:：].*", re.IGNORECASE),
+    re.compile(r"^Figure\s*\d+[\s:：].*", re.IGNORECASE),
+    re.compile(r"^(Caption|Alt\s*text)[\s:：].*", re.IGNORECASE),
+    re.compile(r"^Credit:.*", re.IGNORECASE),
+    re.compile(r"^Source:.*(via|Getty|AP|Reuters|Shutterstock|Wikimedia)", re.IGNORECASE),
+    # 太短的句子（< 8 字符）往往是导航/按钮文字
+    re.compile(r"^.{1,7}$"),
+]
+
+# 正文提取时跳过的 HTML 标签选择器
+SKIP_CSS_SELECTORS = [
+    "figcaption", ".caption", ".wp-caption-text", ".image-caption",
+    ".photo-caption", ".video-caption", "nav", "footer", "header",
+    ".related", ".sidebar", ".comments", ".author-bio", ".share",
+    ".advertisement", ".newsletter-signup", ".read-more",
+    '[role="complementary"]', 'aside',
+    "img", "picture", "video", "iframe", "script", "style", "noscript",
+]
+
+# 正文提取时保留的容器（优先级从高到低）
+CONTENT_SELECTORS = [
+    "article", '[role="main"]', 'main',
+    ".article-body", ".post-content", ".entry-content", ".story-body",
+    ".article-content", ".news-article", ".content-body",
+    "#article-body", "#story-body", "#content-body",
+    ".rich-text", ".prose", ".body-text", ".text-content",
+]
+
+
+def _is_caption_line(line: str) -> bool:
+    """判断一行文本是否为配图说明"""
+    stripped = line.strip()
+    if not stripped:
+        return True  # 空行不算 caption 但我们也跳过
+    for pat in CAPTION_PATTERNS:
+        if pat.match(stripped):
+            return True
+    # 如果上一行很短（< 4 词）且当前行是描述性的，也可能是 caption
+    return False
+
+
+def _extract_clean_text(soup) -> str:
+    """从 BeautifulSoup 对象中提取干净正文，过滤配图说明和 UI 文本"""
+    # 移除不需要的元素
+    for selector in SKIP_CSS_SELECTORS:
+        for el in soup.select(selector):
+            el.decompose()
+
+    # 找正文容器
+    body_el = None
+    for selector in CONTENT_SELECTORS:
+        body_el = soup.select_one(selector)
+        if body_el:
+            break
+
+    if not body_el:
+        body_el = soup.body or soup
+
+    # 提取文本，按段落清理
+    lines: list[str] = []
+    for el in body_el.find_all(["p", "h1", "h2", "h3", "h4", "li"]):
+        text = el.get_text(strip=True)
+        if not text:
+            continue
+        # 跳过 caption
+        if _is_caption_line(text):
+            continue
+        # 跳过过短文本（导航等）
+        if len(text) < 20 and el.name != "p":
+            continue
+        # 跳过明显的 UI 文本
+        if text.lower() in ("share", "print", "email", "subscribe", "sign up",
+                            "log in", "more", "back to top", "close", "menu"):
+            continue
+        lines.append(text)
+
+    return "\n".join(lines)
+
+
+def enrich_article_body(article: Article) -> Article:
+    """抓取原文网页，提取正文内容到 article.body。对 Google News 源尝试多种策略。"""
+    if article.body:
+        return article  # 已有正文，跳过
+
+    # 策略 1：The Black Vault 等已有 raw_description，直接清理
+    if article.raw_description and len(article.raw_description) > 200:
+        clean = re.sub(r'<[^>]+>', ' ', article.raw_description)
+        clean = re.sub(r'The post\s+\S+\s+appeared first.*$', '', clean, flags=re.IGNORECASE)
+        clean = re.sub(r'\[\.\.\.\].*$', '', clean)
+        clean = re.sub(r'\s+', ' ', clean).strip()
+        if len(clean) > 100:
+            article.body = clean
+            logger.info(f"  Body from RSS desc: {len(article.body)} chars")
+            return article
+
+    # 策略 2：Google News URL → 尝试直接抓原文页
+    if "news.google.com/rss" in article.url:
+        # 尝试搜索找到原始文章 URL
+        source_name = article.source_name.replace("📰 ", "").strip()
+        search_title = article.title[:100]
+        body_text = _scrape_via_search(search_title, source_name)
+        if body_text and len(body_text) > 80:
+            article.body = body_text
+            logger.info(f"  Body from search: {len(article.body)} chars")
+            return article
+
+    # 策略 3：普通 URL，直接爬取
+    try:
+        resp = requests.get(
+            article.url,
+            headers={"User-Agent": (
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/125.0.0.0 Safari/537.36"
+            )},
+            timeout=15,
+            allow_redirects=True,
+        )
+        if resp.status_code != 200:
+            logger.warning(f"  Body fetch failed: HTTP {resp.status_code}")
+            return article
+
+        soup = BeautifulSoup(resp.content, "lxml")
+        body_text = _extract_clean_text(soup)
+
+        if body_text and len(body_text) > 80:
+            # 去掉与标题重复的首行
+            first_line = body_text.split("\n")[0]
+            if article.title[:30].lower() in first_line.lower():
+                body_text = "\n".join(body_text.split("\n")[1:]).strip()
+            article.body = body_text
+            logger.info(f"  Body scraped: {len(article.body)} chars")
+        else:
+            logger.info(f"  Body scraped too short ({len(body_text)} chars), kept summary")
+
+    except Exception as e:
+        logger.warning(f"  Body fetch error: {e}")
+
+    return article
+
+
+def _scrape_via_search(title: str, source: str) -> str:
+    """通过 Bing 搜索找到原文章链接并抓取正文"""
+    try:
+        query = f'site:{source} "{title[:60]}"'
+        search_url = f"https://www.bing.com/search?q={requests.utils.quote(query)}"
+        resp = requests.get(
+            search_url,
+            headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"},
+            timeout=10,
+        )
+        if resp.status_code != 200:
+            return ""
+
+        soup = BeautifulSoup(resp.content, "lxml")
+        # 提取搜索结果中的第一个外部链接
+        for link in soup.select("a[href]"):
+            href = link.get("href", "")
+            # Bing 结果中的实际链接
+            if href.startswith("http") and "bing.com" not in href and "google.com" not in href and "microsoft.com" not in href:
+                # 访问文章页面
+                try:
+                    article_resp = requests.get(
+                        href,
+                        headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"},
+                        timeout=10,
+                        allow_redirects=True,
+                    )
+                    if article_resp.status_code == 200:
+                        article_soup = BeautifulSoup(article_resp.content, "lxml")
+                        text = _extract_clean_text(article_soup)
+                        if text and len(text) > 80:
+                            return text
+                except Exception:
+                    continue
+                break  # 只试第一个匹配的链接
+    except Exception as e:
+        logger.debug(f"  Search fallback failed: {e}")
+    return ""
 
 
 # ═══════════════════════════════════════════════════════════════

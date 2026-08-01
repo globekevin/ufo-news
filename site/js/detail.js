@@ -170,7 +170,20 @@ function renderArticle(article, idx, allArticles) {
   renderBodyContent(article);
 
   // --- Original English ---
-  if (article.title && article.summary) {
+  if (article.body) {
+    var enBody = article.body;
+    var enHTML = '<h2 class="body-heading">原文参考</h2>';
+    // 正文分段
+    var enParas = enBody.split(/\.(?=\s+[A-Z])|(?<=\.)\s+(?=[A-Z])/);
+    for (var p = 0; p < enParas.length && p < 6; p++) {
+      var para = enParas[p].trim();
+      if (para.length > 5) {
+        enHTML += '<p class="body-text-en">' + escapeHtml(para) + '</p>';
+      }
+    }
+    document.getElementById('englishOriginal').innerHTML = enHTML;
+    document.getElementById('englishOriginal').style.display = 'block';
+  } else if (article.title && article.summary) {
     var enHTML = '<h2 class="body-heading">原文参考</h2>' +
       '<p class="body-text-en"><strong>' + escapeHtml(article.title) + '</strong></p>' +
       '<p class="body-text-en">' + escapeHtml(article.summary) + '</p>';
@@ -212,54 +225,58 @@ function renderArticle(article, idx, allArticles) {
 // ═══════════════════════════════════════════════════════════
 function renderBodyContent(article) {
   var container = document.getElementById('bodyContent');
+
+  // 优先使用完整中文正文翻译
+  var bodyCn = article.body_cn || '';
+  if (bodyCn && bodyCn.length > 30) {
+    var html = '';
+    var paras = bodyCn.split(/\n+/).filter(function(p) { return p.trim().length > 0; });
+    for (var i = 0; i < paras.length; i++) {
+      html += '<p class="body-text">' + escapeHtml(paras[i].trim()) + '</p>';
+    }
+    // 如果内容够多，加引述
+    if (paras.length > 3) {
+      var midPara = paras[Math.floor(paras.length / 2)].trim();
+      if (midPara.length > 20) {
+        html += '<div class="pull-quote"><span class="quote-mark">"</span><span class="quote-text">' + escapeHtml(midPara.substring(0, 80)) + '</span></div>';
+      }
+    }
+    container.innerHTML = html;
+    return;
+  }
+
+  // 降级：用 summary_cn
   var text = article.summary_cn || article.summary || '';
   if (!text) {
     container.innerHTML = '<p class="body-text">暂无详细内容。</p>';
     return;
   }
 
-  // Split into sentences, group into paragraphs
   var sentences = text.split(/(?<=[。！？；\n])/g).filter(function(s) {
     return s.trim().length > 0;
   });
 
-  if (sentences.length === 0) {
-    container.innerHTML = '<p class="body-text">' + escapeHtml(text) + '</p>';
-    return;
-  }
-
   var html = '';
-  var totalSentences = sentences.length;
-
-  if (totalSentences <= 3) {
-    // Short content: just one paragraph
+  if (sentences.length <= 3) {
     html += '<p class="body-text">' + escapeHtml(sentences.join('')) + '</p>';
   } else {
-    // First paragraph: 1-3 sentences
-    var firstGroup = sentences.slice(0, Math.min(3, totalSentences));
+    var firstGroup = sentences.slice(0, Math.min(3, sentences.length));
     html += '<p class="body-text">' + escapeHtml(firstGroup.join('')) + '</p>';
-
-    // Add a heading if content is long enough
-    if (totalSentences > 5) {
+    if (sentences.length > 5) {
       html += '<h2 class="body-heading">关键详情</h2>';
     }
-
-    // Remaining sentences in groups of 2-3
-    var remaining = sentences.slice(Math.min(3, totalSentences));
+    var remaining = sentences.slice(Math.min(3, sentences.length));
     for (var i = 0; i < remaining.length; i += 3) {
       var group = remaining.slice(i, i + 3);
       html += '<p class="body-text">' + escapeHtml(group.join('')) + '</p>';
     }
-
-    // Add pull quote if content is substantial
-    if (totalSentences > 6) {
-      var quoteSentence = sentences[Math.floor(totalSentences / 2)].replace(/^[""]|[""]$/g, '').trim();
+    if (sentences.length > 6) {
+      var quoteSentence = sentences[Math.floor(sentences.length / 2)].replace(/^[""]|[""]$/g, '').trim();
       if (quoteSentence.length > 10) {
         html += '<div class="pull-quote"><span class="quote-mark">"</span><span class="quote-text">' + escapeHtml(quoteSentence) + '</span></div>';
       }
     }
   }
-
   container.innerHTML = html;
 }
 
