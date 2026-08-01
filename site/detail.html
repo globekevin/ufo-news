@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UFO DAILY — 详情</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #050010;
+  --bg-panel: #0A122E;
+  --bg-card: rgba(10, 18, 46, 0.8);
+  --text-primary: #F0EBE0;
+  --text-secondary: rgba(240, 235, 224, 0.6);
+  --text-tertiary: rgba(240, 235, 224, 0.45);
+  --text-dim: rgba(240, 235, 224, 0.4);
+  --accent-cyan: #06B6D4;
+  --accent-red: #FF8A8A;
+  --accent-gold: #F0C060;
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-card: rgba(255, 255, 255, 0.08);
+  --radius-card: 16px;
+  --radius-sm: 12px;
+  --font-hero: 'Inter', 'PingFang SC', 'Noto Sans SC', sans-serif;
+  --font-body: 'Noto Sans SC', 'PingFang SC', sans-serif;
+  --font-mono: 'Inter', monospace;
+  --content-width: 780px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-body);background:var(--bg-deep);color:var(--text-primary);overflow-x:hidden}
+#app-wrapper{width:1440px;transform-origin:top left}
+
+/* Top Bar */
+.top-bar{display:flex;align-items:center;justify-content:space-between;height:72px;padding:0 80px;background:rgba(5,5,15,0.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border-subtle);position:sticky;top:0;z-index:100}
+.back-group{display:flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none}
+.back-arrow{font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--accent-cyan)}
+.back-text{font-size:14px;font-weight:500;color:rgba(240,235,224,0.7);transition:color 0.2s}
+.back-group:hover .back-text{color:var(--accent-cyan)}
+.top-bar-logo{font-family:var(--font-hero);font-weight:900;font-size:14px;letter-spacing:2px;color:var(--text-primary)}
+.top-bar-right{display:flex;gap:24px;align-items:center}
+.top-nav-link{font-size:13px;color:var(--text-secondary);cursor:pointer;text-decoration:none;transition:color 0.2s}
+.top-nav-link:hover{color:var(--accent-cyan)}
+.top-nav-link.accent{color:var(--accent-cyan);font-weight:500}
+
+/* Hero Image */
+.hero-img{width:1440px;height:500px;overflow:hidden;position:relative}
+.hero-img img{width:100%;height:100%;object-fit:cover}
+.hero-img-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, #0A122E 0%, #151B3D 40%, #0F1A3A 70%, #0A122E 100%);position:relative}
+.hero-img-fallback::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%, rgba(6,182,212,0.12) 0%, transparent 70%),radial-gradient(ellipse at 70% 40%, rgba(255,138,138,0.08) 0%, transparent 60%)}
+.hero-img-icon{font-size:120px;opacity:0.3;filter:blur(1px)}
+
+/* Article Body */
+.article-body{display:flex;flex-direction:column;align-items:center;padding:0 80px}
+.article-content{width:var(--content-width);padding-top:60px;display:flex;flex-direction:column}
+
+/* Meta */
+.meta-row{display:flex;align-items:center;gap:16px;margin-bottom:32px;flex-wrap:wrap}
+.meta-tag{padding:4px 12px;border-radius:6px;font-size:12px;font-weight:500;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.4);color:var(--accent-cyan)}
+.meta-tag.red{background:rgba(255,138,138,0.15);border-color:rgba(255,138,138,0.4);color:var(--accent-red)}
+.meta-tag.gold{background:rgba(240,192,96,0.15);border-color:rgba(240,192,96,0.4);color:var(--accent-gold)}
+.meta-source{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--text-primary)}
+.meta-sep{font-family:var(--font-mono);font-size:13px;color:var(--text-dim)}
+.meta-date,.meta-read{font-size:13px;color:rgba(240,235,224,0.5)}
+
+/* Title & Subtitle */
+.article-title{font-family:var(--font-hero);font-weight:900;font-size:44px;line-height:1.23;color:var(--text-primary);letter-spacing:-1.5px;margin-bottom:20px}
+.article-subtitle{font-size:19px;line-height:1.58;color:rgba(240,235,224,0.7);margin-bottom:40px}
+
+/* Author */
+.author-row{display:flex;align-items:center;gap:16px;padding-bottom:48px;border-bottom:1px solid var(--border-subtle);margin-bottom:48px}
+.author-avatar{width:44px;height:44px;border-radius:50%;background:rgba(6,182,212,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--accent-cyan);flex-shrink:0}
+.author-info{display:flex;flex-direction:column;gap:2px}
+.author-name{font-size:14px;font-weight:600;color:var(--text-primary)}
+.author-note{font-size:12px;color:var(--text-tertiary)}
+
+/* Body */
+.body-text{font-size:17px;line-height:1.76;color:rgba(240,235,224,0.85);margin-bottom:24px}
+.body-heading{font-family:var(--font-hero);font-weight:900;font-size:28px;line-height:1.29;color:var(--text-primary);margin:24px 0 16px;padding-top:8px}
+.body-text-en{font-size:15px;line-height:1.7;color:rgba(240,235,224,0.55);margin-bottom:20px;font-style:italic;padding:20px 24px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm)}
+
+/* Pull Quote */
+.pull-quote{display:flex;gap:16px;padding:32px 40px;border-radius:var(--radius-card);background:rgba(6,182,212,0.06);border-left:3px solid rgba(6,182,212,0.2);margin:24px 0 24px;align-items:flex-start}
+.quote-mark{font-family:var(--font-hero);font-weight:900;font-size:60px;line-height:0.6;color:var(--accent-cyan);flex-shrink:0;width:40px}
+.quote-text{font-size:22px;font-weight:600;line-height:1.55;color:var(--text-primary)}
+
+/* Source Link Card */
+.source-card{display:flex;align-items:center;gap:20px;padding:28px 32px;border-radius:var(--radius-card);background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.25);margin:48px 0 20px;text-decoration:none}
+.source-card:hover{border-color:rgba(6,182,212,0.5)}
+.source-icon-box{width:48px;height:48px;border-radius:var(--radius-sm);background:rgba(6,182,212,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.source-icon-text{font-family:var(--font-hero);font-weight:900;font-size:10px;color:var(--accent-cyan);letter-spacing:1px;text-align:center;line-height:1.2}
+.source-info{flex:1;display:flex;flex-direction:column;gap:4px}
+.source-label{font-size:12px;font-weight:500;color:rgba(240,235,224,0.5)}
+.source-url{font-family:var(--font-mono);font-size:15px;font-weight:600;color:var(--accent-cyan);word-break:break-all}
+.source-btn{display:flex;align-items:center;gap:8px;padding:14px 28px;border-radius:var(--radius-sm);background:var(--accent-cyan);color:#050010;font-size:15px;font-weight:600;cursor:pointer;text-decoration:none;transition:opacity 0.2s,transform 0.2s;flex-shrink:0;white-space:nowrap}
+.source-btn:hover{opacity:0.85;transform:translateY(-1px)}
+.source-btn-arrow{font-size:16px;font-weight:700}
+
+/* Related Articles */
+.related-section{width:1440px;padding:80px;display:flex;flex-direction:column;gap:40px;background:rgba(10,18,46,0.4)}
+.related-header{display:flex;justify-content:space-between;align-items:center}
+.related-title{font-family:var(--font-hero);font-weight:900;font-size:32px;color:var(--text-primary);letter-spacing:-1px}
+.related-view-all{font-size:14px;font-weight:500;color:var(--accent-cyan);cursor:pointer;text-decoration:none;transition:opacity 0.2s}
+.related-view-all:hover{opacity:0.8}
+.related-grid{display:flex;gap:24px}
+.rel-card{flex:1;border-radius:var(--radius-card);overflow:hidden;background:var(--bg-card);border:1px solid var(--border-card);cursor:pointer;transition:border-color 0.3s,transform 0.2s}
+.rel-card:hover{border-color:rgba(255,255,255,0.2);transform:translateY(-2px)}
+.rel-card-img{width:100%;height:200px;overflow:hidden;position:relative}
+.rel-card-img img{width:100%;height:100%;object-fit:cover}
+.rel-card-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, #0F1A3A, #151B3D);font-size:48px;opacity:0.4}
+.rel-card-content{padding:16px 20px 20px;display:flex;flex-direction:column;gap:8px}
+.rel-card-tag{font-size:11px;font-weight:500;color:var(--accent-cyan)}
+.rel-card-tag.red{color:var(--accent-red)}
+.rel-card-tag.gold{color:var(--accent-gold)}
+.rel-card-title{font-size:16px;font-weight:600;line-height:1.5;color:var(--text-primary)}
+.rel-card-date{font-family:var(--font-mono);font-size:12px;color:var(--text-tertiary)}
+
+/* Footer */
+.detail-footer{width:1440px;padding:64px 80px 48px;display:flex;flex-direction:column;gap:24px;background:rgba(8,16,42,0.4);border-top:1px solid var(--border-subtle)}
+.footer-top-row{display:flex;justify-content:space-between;align-items:center}
+.footer-credits{font-family:var(--font-mono);font-size:12px;color:var(--text-dim);flex:1;margin-right:24px}
+.footer-next{font-size:13px;font-weight:500;color:var(--accent-cyan);text-decoration:none;cursor:pointer;transition:opacity 0.2s;white-space:nowrap}
+.footer-next:hover{opacity:0.8}
+.footer-bar{border-top:1px solid var(--border-subtle);padding-top:16px;display:flex;justify-content:space-between;align-items:center}
+.footer-copyright{font-family:var(--font-mono);font-size:12px;color:var(--text-dim)}
+.footer-note{font-size:12px;color:var(--text-dim)}
+
+/* Loading / Error states */
+.loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 80px;gap:16px;min-height:400px}
+.loading-spinner{width:40px;height:40px;border:3px solid var(--border-subtle);border-top-color:var(--accent-cyan);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:14px;color:var(--text-tertiary)}
+.error-state{display:none;flex-direction:column;align-items:center;justify-content:center;padding:120px 80px;gap:16px;min-height:400px;text-align:center}
+.error-emoji{font-size:64px;opacity:0.5}
+.error-title{font-size:20px;font-weight:600;color:var(--text-primary)}
+.error-note{font-size:14px;color:var(--text-tertiary);margin-bottom:16px}
+.error-back{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:var(--radius-sm);background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);color:var(--accent-cyan);font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;transition:background 0.2s}
+.error-back:hover{background:rgba(6,182,212,0.25)}
+
+/* Responsive scaling */
+@media(min-width:1440px){#app-wrapper{margin:0 auto}}
+</style>
+</head>
+<body>
+<div id="app-wrapper">
+
+<!-- Top Bar -->
+<nav class="top-bar">
+  <a class="back-group" href="index.html">
+    <span class="back-arrow">←</span>
+    <span class="back-text">返回首页</span>
+  </a>
+  <span class="top-bar-logo">UFO DAILY</span>
+  <div class="top-bar-right">
+    <a class="top-nav-link" id="prevLink" href="#">上一篇</a>
+    <a class="top-nav-link" id="nextLink" href="#">下一篇</a>
+    <a class="top-nav-link accent" id="shareLink" href="javascript:void(0)">分享</a>
+  </div>
+</nav>
+
+<!-- Loading -->
+<div class="loading-state" id="loadingState">
+  <div class="loading-spinner"></div>
+  <span class="loading-text">正在加载文章…</span>
+</div>
+
+<!-- Error -->
+<div class="error-state" id="errorState">
+  <span class="error-emoji">🛸</span>
+  <span class="error-title" id="errorTitle">文章未找到</span>
+  <span class="error-note" id="errorNote">请检查链接是否正确，或返回首页浏览最新资讯</span>
+  <a class="error-back" href="index.html">← 返回首页</a>
+</div>
+
+<!-- Article Container -->
+<div id="articleContainer" style="display:none">
+
+  <!-- Hero Image -->
+  <div class="hero-img" id="heroImage"></div>
+
+  <!-- Article Body -->
+  <div class="article-body">
+    <article class="article-content">
+
+      <!-- Meta -->
+      <div class="meta-row" id="metaRow"></div>
+
+      <!-- Title -->
+      <h1 class="article-title" id="articleTitle"></h1>
+      <p class="article-subtitle" id="articleSubtitle"></p>
+
+      <!-- Author -->
+      <div class="author-row">
+        <div class="author-avatar">编</div>
+        <div class="author-info">
+          <span class="author-name">UFO DAILY 编辑部</span>
+          <span class="author-note" id="authorNote">AI 编译 & 翻译 · 每日 06:00 更新</span>
+        </div>
+      </div>
+
+      <!-- Body Content -->
+      <div id="bodyContent"></div>
+
+      <!-- Original English context -->
+      <div id="englishOriginal" style="display:none"></div>
+
+      <!-- Source Link Card -->
+      <a class="source-card" id="sourceCard" href="#" target="_blank" rel="noopener">
+        <div class="source-icon-box">
+          <span class="source-icon-text" id="sourceIcon">来源</span>
+        </div>
+        <div class="source-info">
+          <span class="source-label">原文来源</span>
+          <span class="source-url" id="sourceUrlDisplay"></span>
+        </div>
+        <span class="source-btn">访问原文 <span class="source-btn-arrow">→</span></span>
+      </a>
+
+    </article>
+  </div>
+
+  <!-- Related Articles -->
+  <section class="related-section">
+    <div class="related-header">
+      <h2 class="related-title">相关文章</h2>
+      <a class="related-view-all" href="index.html">查看全部 →</a>
+    </div>
+    <div class="related-grid" id="relatedGrid"></div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="detail-footer">
+    <div class="footer-top-row">
+      <span class="footer-credits" id="footerCredits">编译来源：—  |  翻译：UFO DAILY 编辑部  |  发布时间：—</span>
+      <a class="footer-next" id="footerNext" href="#">下一篇 →</a>
+    </div>
+    <div class="footer-bar">
+      <span class="footer-copyright">Copyright 2026 UFO DAILY</span>
+      <span class="footer-note">本文为 AI 编译内容，原文版权归原作者所有</span>
+    </div>
+  </footer>
+
+</div>
+
+</div>
+
+<script src="js/detail.js"></script>
+</body>
+</html>
